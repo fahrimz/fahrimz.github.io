@@ -1,50 +1,55 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Header from '../components/Header.astro';
-import Footer from '../components/Footer.astro';
-import { SITE_TITLE, SITE_DESCRIPTION } from '../consts';
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 ---
 
 <!doctype html>
 <html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This
-				template serves as a lightweight, minimally-styled starting point for anyone looking to build
-				a personal website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to <a href="https://docs.astro.build/"
-					>read the docs
-				</a> or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out <a
-					href="https://github.com/Charca/astro-blog-template"
-					>astro-blog-template
-				</a> by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body class="h-full flex flex-col gap-4 max-w-3xl mx-auto mb-20">
+    <Header />
+    <main class="h-full px-8 flex flex-col gap-4">
+      <h1>Hello World!</h1>
+      <p>
+        I'm Fahri, a software developer specializing in mobile and web
+        development with over <strong>six years of experience</strong>.
+      </p>
+      <p>
+        Currently, I work at Telkom Indonesia, where I develop apps like <a
+          href="https://pijarmahir.id">Pijar Mahir</a
+        >, a course-taking platform with over <strong>6 million users</strong>.
+      </p>
+      <p>
+        I love building apps that look great and feel even better to use. I'm
+        also passionate about animations and enjoy crafting smooth, delightful
+        interactions. Check out some of my projects—like my animation
+        experiments on <a
+          href="https://github.com/fahrimz/oneDayOneSlice/tree/main/results/README.md"
+          target="_blank"
+          class="link">GitHub</a
+        >.
+      </p>
+      <p>
+        While my primary focus is <strong>React Native</strong>, I'm also
+        experienced with
+        <strong>Jetpack Compose</strong>, <strong>SwiftUI</strong>, and <strong
+          >Flutter</strong
+        >. Ultimately, these are just tools—what drives me is solving problems
+        and bringing ideas to life.
+      </p>
+      <p>
+        Beyond code, I love exploring web novels, games and movies—sources of
+        creativity that often spark new ideas. If you're into tech, creative
+        challenges, or just want to chat about these, let's connect!
+      </p>
+      <p>You can find me here:</p>
+      <ul class="flex gap-4">
+        <li><a class="link" target="_blank" href="https://github.com/fahrimz">GitHub</a></li>
+        <li><a class="link" target="_blank" href="https://linkedin.com/in/fahrimz">Linkedin</a></li>
+      </ul>
+    </main>
+  </body>
 </html>
