@@ -1,0 +1,89 @@
+---
+import BaseHead from "../components/BaseHead.astro";
+import Header from "../components/Header.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
+import { motion } from "motion/react";
+
+type Project = {
+  title: string;
+  description: string;
+  link: string;
+  image: string;
+  keywords: string[];
+};
+
+const projects: Project[] = [
+  {
+    title: "JLPT",
+    description: "Japanese dictionary quiz app",
+    link: "https://fahrimz.github.io/jlpt",
+    image: "/jlpt.png",
+    keywords: ["React", "React Router", "Vite", "Typescript"],
+  },
+  {
+    title: "MEZZA-9",
+    description: "Indonesian Coffee beans e-commerce",
+    link: "https://mezza-9.id",
+    image: "/mezza9.png",
+    keywords: [
+      "React",
+      "Next.js",
+      "Tailwind CSS",
+      "Prisma",
+      "Postgres",
+      "Typescript",
+    ],
+  },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body class="h-full flex flex-col gap-4 max-w-3xl mx-auto mb-20">
+    <Header />
+    <main class="h-full px-8 flex flex-col gap-4">
+      <h1>Projects</h1>
+      <section>
+        <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
+          {
+            projects.map((project, index) => {
+              return (
+                <motion.li
+                  client:load
+                  key={index}
+                  className="bg-white rounded-lg shadow-md overflow-hidden [--scale:1] md:[--scale:1.1]"
+                  whileHover={{ scale: "var(--scale)" }}
+                >
+                  <a
+                    href={project.link}
+                    class="flex flex-col gap-2"
+                    target="_blank"
+                  >
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      class="w-full h-44 object-cover"
+                    />
+                    <div class="pt-2 pb-4 px-4">
+                      <h6 class="text-lg mb-0!">{project.title}</h6>
+                      <p class="text-sm text-gray-500">{project.description}</p>
+                      <div class="flex flex-row text-xs gap-2 mt-4">
+                        <span class="text-gray-400 font-bold">Keywords: </span>
+                        <span class="text-gray-400">
+                          {project.keywords.join(", ")}
+                        </span>
+                      </div>
+                    </div>
+                  </a>
+                </motion.li>
+              );
+            })
+          }
+        </ul>
+      </section>
+    </main>
+  </body>
+</html>

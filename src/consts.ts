@@ -3,4 +3,4 @@
 
 export const SITE_TITLE = "Fahri Zulkarnaen";
 export const SITE_DESCRIPTION =
-  "Fahri Zulkarnaen, Mobile Developer, Web Developer, React Native Developer";
+  "Fahri Zulkarnaen, Software Developer, Mobile Developer, Web Developer, React Native Developer";
