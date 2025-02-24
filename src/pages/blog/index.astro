@@ -4,6 +4,7 @@ import Header from "../../components/Header.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
 import { getCollection } from "astro:content";
 import FormattedDate from "../../components/FormattedDate.astro";
+import { motion } from "motion/react";
 
 const posts = (await getCollection("blog")).sort(
   (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()
@@ -18,7 +19,11 @@ const posts = (await getCollection("blog")).sort(
   <body class="h-full flex flex-col gap-4 max-w-3xl mx-auto mb-20">
     <Header />
     <main class="h-full px-8 flex flex-col gap-4">
-      <h1>Blog</h1>
+      <motion.h1
+        client:load
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}>Blog</motion.h1
+      >
       <section>
         <ul class="flex flex-col gap-4">
           {
@@ -26,7 +31,9 @@ const posts = (await getCollection("blog")).sort(
               return (
                 <li>
                   <a href={`/blog/${post.id}/`} class="flex justify-between">
-                    <span class="title whitespace-nowrap link">{post.data.title}</span>
+                    <span class="title whitespace-nowrap link">
+                      {post.data.title}
+                    </span>
                     <span
                       class="flex-grow mx-2 h-[4px] mt-4"
                       style={{

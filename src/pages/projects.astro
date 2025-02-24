@@ -18,11 +18,18 @@ const projects: Project[] = [
     description: "Japanese dictionary quiz app",
     link: "https://fahrimz.github.io/jlpt",
     image: "/jlpt.png",
-    keywords: ["React", "React Router", "Vite", "Typescript"],
+    keywords: [
+      "React",
+      "React Router",
+      "Tailwind CSS",
+      "Vite",
+      "Typescript",
+      "Bun",
+    ],
   },
   {
     title: "MEZZA-9",
-    description: "Indonesian Coffee beans e-commerce",
+    description: "Indonesian coffee beans e-commerce",
     link: "https://mezza-9.id",
     image: "/mezza9.png",
     keywords: [
@@ -30,8 +37,12 @@ const projects: Project[] = [
       "Next.js",
       "Tailwind CSS",
       "Prisma",
-      "Postgres",
+      "PostgreSQL",
+      "Auth.js",
       "Typescript",
+      "NPM",
+      "Cloudinary",
+      "Firebase",
     ],
   },
 ];
@@ -45,7 +56,11 @@ const projects: Project[] = [
   <body class="h-full flex flex-col gap-4 max-w-3xl mx-auto mb-20">
     <Header />
     <main class="h-full px-8 flex flex-col gap-4">
-      <h1>Projects</h1>
+      <motion.h1
+        client:load
+        initial={{ opacity: 0, y: -50 }}
+        animate={{ opacity: 1, y: 0 }}>Projects</motion.h1
+      >
       <section>
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           {
@@ -70,12 +85,13 @@ const projects: Project[] = [
                     <div class="pt-2 pb-4 px-4">
                       <h6 class="text-lg mb-0!">{project.title}</h6>
                       <p class="text-sm text-gray-500">{project.description}</p>
-                      <div class="flex flex-row text-xs gap-2 mt-4">
-                        <span class="text-gray-400 font-bold">Keywords: </span>
-                        <span class="text-gray-400">
-                          {project.keywords.join(", ")}
-                        </span>
-                      </div>
+                      <ul class="flex flex-wrap gap-2 text-xs mt-4">
+                        {project.keywords.map((keyword, index) => (
+                          <li class="bg-gray-200 px-2 py-1 rounded-md">
+                            {keyword}
+                          </li>
+                        ))}
+                      </ul>
                     </div>
                   </a>
                 </motion.li>
