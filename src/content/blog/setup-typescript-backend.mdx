@@ -1,0 +1,119 @@
+---
+title: 'Setting up a Typescript Project using PNPM'
+description: ''
+pubDate: 'Feb 28 2025'
+---
+
+In this article, I will walk through creating a basic typescript project using pnpm.
+
+<br />
+
+#### Setup Project
+
+First of all, create a new folder for the project. Let's call it ts_project.
+
+```bash
+mkdir ts_project
+```
+<br />
+Next, initialize the project using pnpm.
+
+```bash
+cd ts_project
+pnpm init
+```
+
+<br />
+Then, let's setup typescript and required dependencies.
+
+```bash
+pnpm install typescript ts-node @types/node --save-dev
+```
+
+```bash
+pnpm exec tsc --init
+```
+
+<br />
+After the command above, there should be a `tsconfig.json` in the project folder. Change the value to be like this:
+
+```json
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "commonjs",
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "strict": true,
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "forceConsistentCasingInFileNames": true
+  },
+  "include": ["src/**/*.ts"],
+  "exclude": ["node_modules"]
+}
+```
+
+<br />
+For this article, I'll use Express to test if the project runs properly. Let's install it.
+
+```bash
+pnpm install express
+pnpm install @types/express --save-dev
+```
+
+<br />
+Next, create a `src` folder and `index.ts` file.
+
+```bash
+mkdir src
+touch src/index.ts
+```
+
+<br />
+Then add this example code for checking our server:
+
+```typescript
+import express, { Request, Response } from "express";
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(express.json());
+
+app.get("/", (req: Request, res: Response) => {
+  res.send("Hello World!");
+});
+
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
+
+export default app;
+```
+
+<br />
+After that, let's add a `start` script to `package.json` to start the server.
+
+```jsonc
+{
+  ... existing code
+  "scripts": {
+    "start": "ts-node src/index.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  ... existing code
+}
+```
+
+<br />
+Let's start the server and check if its running correctly at https://localhost:3000:
+
+```bash
+pnpm start
+```
+
+<br />
+The server should response with "Hello World!" when you open the browser at https://localhost:3000.
+
+![Hello World](/blog/hello_world.png)
