@@ -3,12 +3,16 @@ import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
 import { motion } from "motion/react";
+import ProjectChip from "../components/ProjectChip";
+import { Image } from "astro:assets";
+import ImgJlpt from '../images/jlpt.png';
+import ImgMezza9 from '../images/mezza9.png';
 
 type Project = {
   title: string;
   description: string;
   link: string;
-  image: string;
+  image: ImageMetadata;
   keywords: string[];
 };
 
@@ -17,8 +21,9 @@ const projects: Project[] = [
     title: "JLPT",
     description: "Japanese dictionary quiz app",
     link: "https://fahrimz.github.io/jlpt",
-    image: "/jlpt.png",
+    image: ImgJlpt,
     keywords: [
+      "Frontend",
       "React",
       "React Router",
       "Tailwind CSS",
@@ -31,8 +36,9 @@ const projects: Project[] = [
     title: "MEZZA-9",
     description: "Indonesian coffee beans e-commerce",
     link: "https://mezza-9.id",
-    image: "/mezza9.png",
+    image: ImgMezza9,
     keywords: [
+      "Fullstack",
       "React",
       "Next.js",
       "Tailwind CSS",
@@ -77,19 +83,22 @@ const projects: Project[] = [
                     class="flex flex-col gap-2"
                     target="_blank"
                   >
-                    <img
+                    <Image
                       src={project.image}
                       alt={project.title}
                       class="w-full h-44 object-cover"
+                      loading={index < 4 ? "eager" : "lazy"}
                     />
                     <div class="pt-2 pb-4 px-4">
                       <h6 class="text-lg mb-0!">{project.title}</h6>
                       <p class="text-sm text-gray-500">{project.description}</p>
                       <ul class="flex flex-wrap gap-2 text-xs mt-4">
                         {project.keywords.map((keyword, index) => (
-                          <li class="bg-gray-200 px-2 py-1 rounded-md">
-                            {keyword}
-                          </li>
+                          <ProjectChip
+                            isHighlighted={index === 0}
+                            text={keyword}
+                            client:load
+                          />
                         ))}
                       </ul>
                     </div>
