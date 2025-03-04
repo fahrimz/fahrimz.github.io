@@ -7,6 +7,7 @@ import ProjectChip from "../components/ProjectChip";
 import { Image } from "astro:assets";
 import ImgJlpt from '../images/jlpt.png';
 import ImgMezza9 from '../images/mezza9.png';
+import ImgChat from '../images/chat_app.png';
 
 type Project = {
   title: string;
@@ -51,6 +52,19 @@ const projects: Project[] = [
       "Firebase",
     ],
   },
+  {
+    title: 'Chat App',
+    description: 'Realtime chat app',
+    link: 'https://fahrimz.github.io/chat_vue',
+    image: ImgChat,
+    keywords: [
+      'Fullstack',
+      'Vue',
+      'Express',
+      'Websocket',
+      'Typescript',
+    ],
+  }
 ];
 ---
 
