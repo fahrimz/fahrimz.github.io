@@ -1,0 +1,14 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import FullScreen from "../../components/FullScreen.astro";
+import { SITE_TITLE } from "../../consts";
+import SnakeGame from '../../components/SnakeGame';
+---
+
+<head>
+  <BaseHead title={`Snake - ${SITE_TITLE}`} description="Snake game made with react.js" />
+</head>
+
+<FullScreen>
+  <SnakeGame client:load />
+</FullScreen>
