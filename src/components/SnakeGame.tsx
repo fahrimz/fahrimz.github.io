@@ -28,23 +28,32 @@ const keyToDirectionMap: Record<string, Direction> = {
 function StartGameDialog({ onStart }: { onStart: (mode: GameMode) => void }) {
   return (
     <motion.div
-      className="absolute bg-white z-50"
+      className="absolute bg-white z-50 shadow-xl rounded-lg"
       key="modal"
       initial={{ opacity: 0, y: "100%" }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className="flex flex-col justify-center items-center gap-4 w-xl h-fit p-8">
+      <div className="flex flex-col justify-center items-center gap-8 w-xl h-fit p-8">
         <h1 className="text-2xl font-semibold">Start Game</h1>
-        <div className="flex flex-row gap-4">
-          {GameModeArr.map((mode, i) => (
-            <button
-              key={i}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer flex-1 capitalize"
-              onClick={() => onStart(mode)}
-            >
-              {mode}
-            </button>
-          ))}
+        <div className="flex flex-col justify-center items-center gap-4">
+          <p>Choose mode</p>
+          <div className="flex flex-row gap-4">
+            {GameModeArr.map((mode, i) => (
+              <motion.button
+                key={i}
+                className="border px-4 py-2 rounded-lg cursor-pointer flex-1 capitalize"
+                onClick={() => onStart(mode)}
+                initial={{ backgroundColor: "#ffffff", color: "#2b7fff" }}
+                whileHover={{
+                  backgroundColor: "#2b7fff",
+                  color: "#ffffff",
+                  scale: 1.15,
+                }}
+              >
+                {mode}
+              </motion.button>
+            ))}
+          </div>
         </div>
       </div>
     </motion.div>
@@ -62,7 +71,7 @@ function ConfirmRestart({
 }) {
   return (
     <motion.div
-      className="absolute bg-white z-50"
+      className="absolute bg-white z-50 shadow-xl rounded-lg"
       key="modal"
       initial={{ opacity: 0, y: "100%" }}
       animate={{ opacity: 1, y: 0 }}
