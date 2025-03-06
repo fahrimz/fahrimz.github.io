@@ -1,9 +1,9 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
-import AudioPickUp from "../../public/item-pick-up.mp3";
-import AudioGameOver from "../../public/game-over.mp3";
-import AudioGameStart from "../../public/game-start.mp3";
+import AudioPickUp from "../assets/item-pick-up.mp3";
+import AudioGameOver from "../assets/game-over.mp3";
+import AudioGameStart from "../assets/game-start.mp3";
 
 type Coord = [number, number];
 type Direction = "up" | "down" | "left" | "right";
