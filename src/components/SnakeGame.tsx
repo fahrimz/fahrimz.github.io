@@ -8,6 +8,9 @@ import AudioGameStart from "../../public/game-start.mp3";
 type Coord = [number, number];
 type Direction = "up" | "down" | "left" | "right";
 
+const GameModeArr = ["normal", "fast", "increasing speed"] as const;
+type GameMode = (typeof GameModeArr)[number];
+
 const directionToDegreeMap: Record<Direction, number> = {
   right: 270,
   left: 90,
@@ -22,17 +25,27 @@ const keyToDirectionMap: Record<string, Direction> = {
   ArrowRight: "right",
 };
 
-function StartGameDialog({ onStart }: { onStart: () => void }) {
+function StartGameDialog({ onStart }: { onStart: (mode: GameMode) => void }) {
   return (
-    <motion.div className="absolute bg-white z-50" key="modal" initial={{ opacity: 0, y: '100%' }} animate={{ opacity: 1, y: 0 }}>
+    <motion.div
+      className="absolute bg-white z-50"
+      key="modal"
+      initial={{ opacity: 0, y: "100%" }}
+      animate={{ opacity: 1, y: 0 }}
+    >
       <div className="flex flex-col justify-center items-center gap-4 w-xl h-fit p-8">
-        <h1 className="text-2xl font-semibold">Start Game?</h1>
-        <button
-          className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
-          onClick={onStart}
-        >
-          Start
-        </button>
+        <h1 className="text-2xl font-semibold">Start Game</h1>
+        <div className="flex flex-row gap-4">
+          {GameModeArr.map((mode, i) => (
+            <button
+              key={i}
+              className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer flex-1 capitalize"
+              onClick={() => onStart(mode)}
+            >
+              {mode}
+            </button>
+          ))}
+        </div>
       </div>
     </motion.div>
   );
@@ -48,10 +61,17 @@ function ConfirmRestart({
   onCancel: () => void;
 }) {
   return (
-    <motion.div className="absolute bg-white z-50" key="modal" initial={{ opacity: 0, y: '100%' }} animate={{ opacity: 1, y: 0 }}>
+    <motion.div
+      className="absolute bg-white z-50"
+      key="modal"
+      initial={{ opacity: 0, y: "100%" }}
+      animate={{ opacity: 1, y: 0 }}
+    >
       <div className="flex flex-col justify-center items-center gap-4 w-xl h-fit p-8">
         <h1 className="text-2xl font-semibold">Game Over!</h1>
-        <p className="text-lg">Your score is <strong>{score}</strong>. Restart?</p>
+        <p className="text-lg">
+          Your score is <strong>{score}</strong>. Restart?
+        </p>
         <div className="flex flex-row gap-4">
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
@@ -74,7 +94,8 @@ function ConfirmRestart({
 export default function SnakeGame() {
   const BOARD_SIZE = 15; // board size, 15x15
   const CELL_SIZE = 40;
-  const MOVEMENT_SPEED = 150; // movement speed in ms
+  const MOVEMENT_SPEED_NORMAL = 150; // movement speed in ms
+  const MOVEMENT_SPEED_FAST = 100; // movement speed in ms
 
   const CENTER_COORD: Coord = [0, 0];
   const INITIAL_SNAKE_COORDS: Coord[] = [CENTER_COORD, [-1, 0]];
@@ -116,8 +137,15 @@ export default function SnakeGame() {
   const isPlaying = useMemo(() => gameState === "playing", [gameState]);
 
   const [audioPickup, setAudioPickup] = useState<HTMLAudioElement | null>(null);
-  const [audioGameOver, setAudioGameOver] = useState<HTMLAudioElement | null>(null);
-  const [audioStartGame, setAudioStartGame] = useState<HTMLAudioElement | null>(null);
+  const [audioGameOver, setAudioGameOver] = useState<HTMLAudioElement | null>(
+    null
+  );
+  const [audioStartGame, setAudioStartGame] = useState<HTMLAudioElement | null>(
+    null
+  );
+
+  const [speed, setSpeed] = useState(MOVEMENT_SPEED_NORMAL);
+  const [gameMode, setGameMode] = useState<GameMode>("normal");
 
   const generateSpawnCoord = (): Coord => {
     // Generate random coordinates within the bounds of minValue and maxValue
@@ -182,6 +210,7 @@ export default function SnakeGame() {
   const resetGame = () => {
     setSnakeCoords(INITIAL_SNAKE_COORDS);
     setLastDirection("right");
+    setSpeed(MOVEMENT_SPEED_NORMAL);
   };
 
   const gameOver = () => {
@@ -229,7 +258,6 @@ export default function SnakeGame() {
 
       // if next snake head is on the body, game over
       const nextHeadCoord = calculateNextSnakeCoord(headCoord, newDirection);
-      console.log("nextHeadCoord", nextHeadCoord);
       if (
         snakeCoords
           .slice(1)
@@ -253,6 +281,10 @@ export default function SnakeGame() {
         headCoord[0] === foodPosition[0] &&
         headCoord[1] === foodPosition[1]
       ) {
+        if (gameMode === "increasing speed") {
+          setSpeed((prev) => prev - 10);
+        }
+
         audioPickup?.play();
         setSnakeCoords([...newCoords, tailCoord]);
         spawnFood();
@@ -273,12 +305,21 @@ export default function SnakeGame() {
     [lastDirection, moveSnake, isPlaying]
   );
 
-  const startGame = () => {
+  const startGame = (mode: GameMode) => {
     resetGame();
     spawnFood();
+    setGameMode(mode);
     setGameState("playing");
     audioStartGame?.play();
   };
+
+  const startMovement = useCallback(() => {
+    clearInterval(movementInterval.current!);
+    movementInterval.current = setInterval(
+      () => moveSnake(lastDirection),
+      speed
+    );
+  }, [moveSnake, lastDirection, speed]);
 
   useEffect(() => {
     window.addEventListener("keydown", handleKeyDown);
@@ -295,15 +336,16 @@ export default function SnakeGame() {
     setAudioStartGame(new Audio(AudioGameStart));
 
     // start movement
-    movementInterval.current = setInterval(
-      () => moveSnake(lastDirection),
-      MOVEMENT_SPEED
-    );
+    startMovement();
 
     return () => {
       clearInterval(movementInterval.current!);
     };
-  }, [moveSnake, lastDirection, setAudioPickup, setAudioGameOver]);
+  }, [setAudioPickup, setAudioGameOver, startMovement]);
+
+  useEffect(() => {
+    setSpeed(gameMode === "fast" ? MOVEMENT_SPEED_FAST : MOVEMENT_SPEED_NORMAL);
+  }, [gameMode]);
 
   useEffect(() => {
     setGameState("idle");
@@ -334,15 +376,15 @@ export default function SnakeGame() {
 
         {/* food */}
         <motion.div
-            className="absolute bg-red-500 rounded-full shadow-md"
-            style={{
-              width: CELL_SIZE * 0.8,
-              height: CELL_SIZE * 0.8,
-              transform: `translate(${CELL_SIZE * foodPosition[0]}px, ${
-                CELL_SIZE * foodPosition[1]
-              }px)`,
-            }}
-          />
+          className="absolute bg-red-500 rounded-full shadow-md"
+          style={{
+            width: CELL_SIZE * 0.8,
+            height: CELL_SIZE * 0.8,
+            transform: `translate(${CELL_SIZE * foodPosition[0]}px, ${
+              CELL_SIZE * foodPosition[1]
+            }px)`,
+          }}
+        />
 
         {/* snake */}
         {snakeCoords.map((coord, index) => (
