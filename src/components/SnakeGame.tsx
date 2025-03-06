@@ -1,6 +1,9 @@
 import clsx from "clsx";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "motion/react";
+import AudioPickUp from "../../public/item-pick-up.mp3";
+import AudioGameOver from "../../public/game-over.mp3";
+import AudioGameStart from "../../public/game-start.mp3";
 
 type Coord = [number, number];
 type Direction = "up" | "down" | "left" | "right";
@@ -48,7 +51,7 @@ function ConfirmRestart({
     <motion.div className="absolute bg-white z-50" key="modal" initial={{ opacity: 0, y: '100%' }} animate={{ opacity: 1, y: 0 }}>
       <div className="flex flex-col justify-center items-center gap-4 w-xl h-fit p-8">
         <h1 className="text-2xl font-semibold">Game Over!</h1>
-        <p className="text-lg">Your score is {score}. Restart?</p>
+        <p className="text-lg">Your score is <strong>{score}</strong>. Restart?</p>
         <div className="flex flex-row gap-4">
           <button
             className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
@@ -111,6 +114,10 @@ export default function SnakeGame() {
   );
   const showStartGame = useMemo(() => gameState === "idle", [gameState]);
   const isPlaying = useMemo(() => gameState === "playing", [gameState]);
+
+  const [audioPickup, setAudioPickup] = useState<HTMLAudioElement | null>(null);
+  const [audioGameOver, setAudioGameOver] = useState<HTMLAudioElement | null>(null);
+  const [audioStartGame, setAudioStartGame] = useState<HTMLAudioElement | null>(null);
 
   const generateSpawnCoord = (): Coord => {
     // Generate random coordinates within the bounds of minValue and maxValue
@@ -179,6 +186,7 @@ export default function SnakeGame() {
 
   const gameOver = () => {
     setGameState("gameover");
+    audioGameOver?.play();
   };
 
   const moveSnake = useCallback(
@@ -245,6 +253,7 @@ export default function SnakeGame() {
         headCoord[0] === foodPosition[0] &&
         headCoord[1] === foodPosition[1]
       ) {
+        audioPickup?.play();
         setSnakeCoords([...newCoords, tailCoord]);
         spawnFood();
       }
@@ -268,6 +277,7 @@ export default function SnakeGame() {
     resetGame();
     spawnFood();
     setGameState("playing");
+    audioStartGame?.play();
   };
 
   useEffect(() => {
@@ -279,6 +289,12 @@ export default function SnakeGame() {
   }, [snakeHeadCoord, handleKeyDown]);
 
   useEffect(() => {
+    // start audio
+    setAudioPickup(new Audio(AudioPickUp));
+    setAudioGameOver(new Audio(AudioGameOver));
+    setAudioStartGame(new Audio(AudioGameStart));
+
+    // start movement
     movementInterval.current = setInterval(
       () => moveSnake(lastDirection),
       MOVEMENT_SPEED
@@ -287,7 +303,7 @@ export default function SnakeGame() {
     return () => {
       clearInterval(movementInterval.current!);
     };
-  }, [moveSnake, lastDirection]);
+  }, [moveSnake, lastDirection, setAudioPickup, setAudioGameOver]);
 
   useEffect(() => {
     setGameState("idle");
@@ -317,18 +333,16 @@ export default function SnakeGame() {
         ))}
 
         {/* food */}
-        <div className="absolute">
-          <div
-            className="bg-red-500"
+        <motion.div
+            className="absolute bg-red-500 rounded-full shadow-md"
             style={{
-              width: CELL_SIZE,
-              height: CELL_SIZE,
+              width: CELL_SIZE * 0.8,
+              height: CELL_SIZE * 0.8,
               transform: `translate(${CELL_SIZE * foodPosition[0]}px, ${
                 CELL_SIZE * foodPosition[1]
               }px)`,
             }}
           />
-        </div>
 
         {/* snake */}
         {snakeCoords.map((coord, index) => (
