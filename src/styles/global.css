@@ -61,3 +61,7 @@ h5 {
 .link:hover {
 	color: var(--accent);
 }
+
+a.active {
+	color: var(--color-green-500);
+}

@@ -4,11 +4,12 @@ import { SITE_TITLE } from "../consts";
 ---
 
 <header>
-  <nav class="px-8 pt-4 flex flex-row items-center justify-between">
+  <nav class="px-8 pt-4 flex flex-row items-center justify-between gap-4">
     <a class="text-xl text-black" href="/">{SITE_TITLE}</a>
-    <div class="space-x-4">
+    <div class="flex flow-row gap-4">
       <HeaderLink href="/blog">Blog</HeaderLink>
       <HeaderLink href="/projects">Projects</HeaderLink>
+      <HeaderLink href="/explorations">Explore</HeaderLink>
     </div>
   </nav>
   <hr class="mt-4 mx-8" />
