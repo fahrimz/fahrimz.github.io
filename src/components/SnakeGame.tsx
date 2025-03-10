@@ -33,7 +33,7 @@ function StartGameDialog({ onStart }: { onStart: (mode: GameMode) => void }) {
       initial={{ opacity: 0, y: "100%" }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className="flex flex-col justify-center items-center gap-8 w-xl h-fit p-8">
+      <div className="flex flex-col justify-center items-center gap-8 w-xs md:w-xl h-fit p-8">
         <h1 className="text-2xl font-semibold">Start Game</h1>
         <div className="flex flex-col justify-center items-center gap-4">
           <p>Choose mode</p>
@@ -41,7 +41,7 @@ function StartGameDialog({ onStart }: { onStart: (mode: GameMode) => void }) {
             {GameModeArr.map((mode, i) => (
               <motion.button
                 key={i}
-                className="border px-4 py-2 rounded-lg cursor-pointer flex-1 capitalize"
+                className="border px-2 md:px-4 py-1 text-sm md:text-base md:py-2 rounded-lg cursor-pointer flex-1 capitalize"
                 onClick={() => onStart(mode)}
                 initial={{ backgroundColor: "#ffffff", color: "#2b7fff" }}
                 whileHover={{
@@ -76,7 +76,7 @@ function ConfirmRestart({
       initial={{ opacity: 0, y: "100%" }}
       animate={{ opacity: 1, y: 0 }}
     >
-      <div className="flex flex-col justify-center items-center gap-4 w-xl h-fit p-8">
+      <div className="flex flex-col justify-center items-center gap-8 w-xs md:w-xl h-fit p-8">
         <h1 className="text-2xl font-semibold">Game Over!</h1>
         <p className="text-lg">
           Your score is <strong>{score}</strong>. Restart?
@@ -101,8 +101,12 @@ function ConfirmRestart({
 }
 
 export default function SnakeGame() {
+  const [screenWidth, setScreenWidth] = useState(0);
   const BOARD_SIZE = 15; // board size, 15x15
-  const CELL_SIZE = 40;
+  const CELL_SIZE = useMemo(
+    () => (screenWidth * 0.8) / BOARD_SIZE,
+    [screenWidth]
+  ); // cell size in px
   const MOVEMENT_SPEED_NORMAL = 150; // movement speed in ms
   const MOVEMENT_SPEED_FAST = 100; // movement speed in ms
 
@@ -223,8 +227,8 @@ export default function SnakeGame() {
   };
 
   const gameOver = () => {
-    setGameState("gameover");
     audioGameOver?.play();
+    setGameState("gameover");
   };
 
   const moveSnake = useCallback(
@@ -290,13 +294,13 @@ export default function SnakeGame() {
         headCoord[0] === foodPosition[0] &&
         headCoord[1] === foodPosition[1]
       ) {
-        if (gameMode === "increasing speed") {
-          setSpeed((prev) => prev - 10);
-        }
-
         audioPickup?.play();
         setSnakeCoords([...newCoords, tailCoord]);
         spawnFood();
+
+        if (gameMode === "increasing speed") {
+          setSpeed((prev) => prev - 10);
+        }
       }
     },
     [snakeCoords, snakeHeadCoord, lastDirection, foodPosition, isPlaying]
@@ -315,11 +319,11 @@ export default function SnakeGame() {
   );
 
   const startGame = (mode: GameMode) => {
+    audioStartGame?.play();
     resetGame();
     spawnFood();
     setGameMode(mode);
     setGameState("playing");
-    audioStartGame?.play();
   };
 
   const startMovement = useCallback(() => {
@@ -357,31 +361,37 @@ export default function SnakeGame() {
   }, [gameMode]);
 
   useEffect(() => {
+    const { innerWidth, innerHeight } = window;
+    setScreenWidth(Math.min(innerWidth, innerHeight));
     setGameState("idle");
   }, []);
 
   return (
-    <div className="flex flex-col justify-center items-center h-screen w-screen gap-4">
+    <div className="flex flex-col justify-center items-center h-fit w-screen gap-4">
       {/* score */}
       <div className="bg-white p-2 rounded-lg shadow-md">
         <p className="text-lg font-semibold">Score: {score}</p>
       </div>
       <div className="flex justify-center items-center">
         {/* board */}
-        {Array.from({ length: BOARD_SIZE }).map((_, i) => (
-          <div key={i}>
-            {Array.from({ length: BOARD_SIZE }).map((_, j) => (
-              <div
-                key={j}
-                className={clsx(
-                  "flex justify-center items-center",
-                  (j + BOARD_SIZE * i) % 2 === 0 ? "bg-blue-100" : "bg-blue-50"
-                )}
-                style={{ width: CELL_SIZE, height: CELL_SIZE }}
-              />
-            ))}
-          </div>
-        ))}
+        <div className="flex justify-center items-center">
+          {Array.from({ length: BOARD_SIZE }).map((_, i) => (
+            <div key={i}>
+              {Array.from({ length: BOARD_SIZE }).map((_, j) => (
+                <div
+                  key={j}
+                  className={clsx(
+                    "flex justify-center items-center",
+                    (j + BOARD_SIZE * i) % 2 === 0
+                      ? "bg-blue-100"
+                      : "bg-blue-50"
+                  )}
+                  style={{ width: CELL_SIZE, height: CELL_SIZE }}
+                />
+              ))}
+            </div>
+          ))}
+        </div>
 
         {/* food */}
         <motion.div
@@ -439,6 +449,48 @@ export default function SnakeGame() {
           </div>
         ))}
       </div>
+      {/* control for small devices */}
+      <div className="flex flex-col justify-center items-center md:hidden">
+        {/* up */}
+        <div className="flex flex-row">
+          <div className="size-20" />
+          <div
+            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
+            onClick={() => moveSnake("up")}
+          >
+            Up
+          </div>
+          <div className="size-20" />
+        </div>
+        {/* left right */}
+        <div className="flex flex-row">
+          <div
+            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
+            onClick={() => moveSnake("left")}
+          >
+            Left
+          </div>
+          <div className="size-20" />
+          <div
+            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
+            onClick={() => moveSnake("right")}
+          >
+            Right
+          </div>
+        </div>
+        {/* down */}
+        <div className="flex flex-row">
+          <div className="size-20" />
+          <div
+            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center"
+            onClick={() => moveSnake("down")}
+          >
+            Down
+          </div>
+          <div className="size-20" />
+        </div>
+      </div>
+
       {showStartGame && <StartGameDialog onStart={startGame} />}
       {showConfirmRestart && (
         <ConfirmRestart
