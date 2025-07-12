@@ -1,0 +1,14 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import FullScreen from "../../components/FullScreen.astro";
+import { SITE_TITLE } from "../../consts";
+import Game2048 from "../../components/Game2048";
+---
+
+<head>
+  <BaseHead title={`2048 - ${SITE_TITLE}`} description="2048 game made with react.js" />
+</head>
+
+<FullScreen>
+  <Game2048 client:load />
+</FullScreen>

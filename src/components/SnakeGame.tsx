@@ -4,6 +4,8 @@ import { motion } from "motion/react";
 import AudioPickUp from "../assets/item-pick-up.mp3";
 import AudioGameOver from "../assets/game-over.mp3";
 import AudioGameStart from "../assets/game-start.mp3";
+import ArrowControls from "./ArrowControls";
+import useScreenWidth from "../hooks/screenWidth";
 
 type Coord = [number, number];
 type Direction = "up" | "down" | "left" | "right";
@@ -101,7 +103,7 @@ function ConfirmRestart({
 }
 
 export default function SnakeGame() {
-  const [screenWidth, setScreenWidth] = useState(0);
+  const screenWidth = useScreenWidth();
   const BOARD_SIZE = 15; // board size, 15x15
   const CELL_SIZE = useMemo(
     () => (screenWidth * 0.8) / BOARD_SIZE,
@@ -361,8 +363,6 @@ export default function SnakeGame() {
   }, [gameMode]);
 
   useEffect(() => {
-    const { innerWidth, innerHeight } = window;
-    setScreenWidth(Math.min(innerWidth, innerHeight));
     setGameState("idle");
   }, []);
 
@@ -450,46 +450,12 @@ export default function SnakeGame() {
         ))}
       </div>
       {/* control for small devices */}
-      <div className="flex flex-col justify-center items-center md:hidden">
-        {/* up */}
-        <div className="flex flex-row">
-          <div className="size-20" />
-          <div
-            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
-            onClick={() => moveSnake("up")}
-          >
-            Up
-          </div>
-          <div className="size-20" />
-        </div>
-        {/* left right */}
-        <div className="flex flex-row">
-          <div
-            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
-            onClick={() => moveSnake("left")}
-          >
-            Left
-          </div>
-          <div className="size-20" />
-          <div
-            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
-            onClick={() => moveSnake("right")}
-          >
-            Right
-          </div>
-        </div>
-        {/* down */}
-        <div className="flex flex-row">
-          <div className="size-20" />
-          <div
-            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center"
-            onClick={() => moveSnake("down")}
-          >
-            Down
-          </div>
-          <div className="size-20" />
-        </div>
-      </div>
+      <ArrowControls
+        onUp={() => moveSnake("up")}
+        onRight={() => moveSnake("right")}
+        onDown={() => moveSnake("down")}
+        onLeft={() => moveSnake("left")}
+      />
 
       {showStartGame && <StartGameDialog onStart={startGame} />}
       {showConfirmRestart && (
