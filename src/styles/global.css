@@ -75,13 +75,13 @@ pre {
 
 code {
 	font-family: 'Satoshi', monospace;
-	font-size: smaller;
 }
 
 /* normal code, not inside pre */
 code:not(pre > code) {
 	background-color: var(--color-green-200);
 	padding: 0.2rem 0.4rem;
+	font-size: smaller;
 }
 
 .main {
