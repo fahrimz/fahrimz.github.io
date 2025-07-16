@@ -65,3 +65,21 @@ h5 {
 a.active {
 	color: var(--color-green-500);
 }
+
+pre {
+  overflow-x: auto;
+  padding: 1rem;
+	margin-top: 0.5rem;
+	border-radius: 4px;
+}
+
+code {
+	font-family: 'Satoshi', monospace;
+	font-size: smaller;
+}
+
+/* normal code, not inside pre */
+code:not(pre > code) {
+	background-color: var(--color-green-200);
+	padding: 0.2rem 0.4rem;
+}
