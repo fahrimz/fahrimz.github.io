@@ -2,7 +2,6 @@
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
-import { motion } from "motion/react";
 ---
 
 <!doctype html>
@@ -13,91 +12,47 @@ import { motion } from "motion/react";
   <body class="h-full flex flex-col gap-4 max-w-3xl mx-auto mb-20">
     <Header />
     <main class="h-full px-8 flex flex-col gap-4 mt-4 md:mt-14">
-      <motion.h1
-        client:load
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}>Hello World!</motion.h1
-      >
-      <motion.p
-        client:load
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 1 }}
-      >
+      <h1>Hello World!</h1>
+      <p>
         I'm Fahri, a software developer specializing in mobile and web
         development with over <strong>six years of experience</strong>.
-      </motion.p>
-      <motion.p
-        client:load
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 1 }}
-      >
+      </p>
+      <p>
         Currently, I work as a fullstack developer at <a
           class="link"
           href="https://ebuddy.gg"
           target="_blank">ebuddy.gg</a
         >, a social app focused on companionship where people can connect, share
         experiences, and build meaningful relationships.
-      </motion.p>
-      <motion.p
-        client:load
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 1 }}
-      >
-        Previously, I developed education platforms at Telkom Indonesia until March
-        2025, including Pijar Mahir and Pijar Sekolah.
-      </motion.p>
-      <motion.p
-        client:load
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 1 }}
-      >
+      </p>
+      <p>
+        Previously, I developed education platforms at Telkom Indonesia until
+        March 2025, including Pijar Mahir and Pijar Sekolah.
+      </p>
+      <p>
         I work with various web and mobile technologies including
         <strong>React</strong>, <strong>Next.js</strong>, <strong
           >React Native</strong
         >, <strong>Jetpack Compose</strong>, and <strong>SwiftUI</strong>.
         Ultimately, these are just tools for solving problems and bringing ideas
         to life.
-      </motion.p>
-      <motion.p
-        client:load
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 1 }}
-      >
-        I love building experiences that look great and feel even better to use. Check out some of my work, including interactive animation
-        experiments, on <a
+      </p>
+      <p>
+        I love building experiences that look great and feel even better to use.
+        Check out some of my work, including interactive animation experiments,
+        on <a
           href="https://github.com/fahrimz/oneDayOneSlice/tree/main/results/README.md"
           target="_blank"
           class="link">GitHub</a
         >.
-      </motion.p>
-      <motion.p
-        client:load
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 1 }}
-      >
+      </p>
+      <p>
         Beyond code, I love exploring web novels, games and movies—sources of
         creativity that often spark new ideas. If you're into tech, creative
         challenges, or just want to chat about these, let's connect!
-      </motion.p>
-      <motion.p
-        client:load
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 1 }}>You can find me here:</motion.p
-      >
-      <motion.ul
-        className="flex gap-4"
-        client:load
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.3, duration: 1 }}
-      >
+      </p>
+      <p>You can find me here:</p>
+      <ul class="flex gap-4">
         <li>
           <a class="link" target="_blank" href="https://github.com/fahrimz"
             >GitHub</a
@@ -108,7 +63,7 @@ import { motion } from "motion/react";
             >Linkedin</a
           >
         </li>
-      </motion.ul>
+      </ul>
     </main>
   </body>
 </html>
