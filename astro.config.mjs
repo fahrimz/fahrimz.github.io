@@ -10,7 +10,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://fahrimz.github.io',
   integrations: [mdx(), sitemap(), react()],
-
+  prefetch: {
+    prefetchAll: true,
+    defaultStrategy: 'viewport',
+  },
   vite: {
     plugins: [tailwindcss()],
   },
