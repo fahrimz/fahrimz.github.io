@@ -2,7 +2,6 @@
 import BaseHead from "../../components/BaseHead.astro";
 import Header from "../../components/Header.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
-import { motion } from "motion/react";
 
 const explorations = [
   { name: "SNAKE", link: "/explorations/snake" },
@@ -18,12 +17,8 @@ const explorations = [
   </head>
   <body class="h-full flex flex-col gap-4 max-w-3xl mx-auto mb-20">
     <Header />
-    <main class="h-full px-8 flex flex-col gap-4">
-      <motion.h1
-        client:load
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}>Explorations</motion.h1
-      >
+    <main class="main">
+      <h1>Explorations</h1>
 
       <ol class="list-decimal list-inside">
         {explorations.map((exploration) => (

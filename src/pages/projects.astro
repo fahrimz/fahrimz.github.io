@@ -2,12 +2,11 @@
 import BaseHead from "../components/BaseHead.astro";
 import Header from "../components/Header.astro";
 import { SITE_TITLE, SITE_DESCRIPTION } from "../consts";
-import { motion } from "motion/react";
 import ProjectChip from "../components/ProjectChip";
 import { Image } from "astro:assets";
-import ImgJlpt from '../images/jlpt.png';
-import ImgMezza9 from '../images/mezza9.png';
-import ImgChat from '../images/chat_app.png';
+import ImgJlpt from "../images/jlpt.png";
+import ImgMezza9 from "../images/mezza9.png";
+import ImgChat from "../images/chat_app.png";
 
 type Project = {
   title: string;
@@ -53,18 +52,12 @@ const projects: Project[] = [
     ],
   },
   {
-    title: 'Chat App',
-    description: 'Realtime chat app',
-    link: 'https://fahrimz.github.io/chat_vue',
+    title: "Chat App",
+    description: "Realtime chat app",
+    link: "https://fahrimz.github.io/chat_vue",
     image: ImgChat,
-    keywords: [
-      'Fullstack',
-      'Vue',
-      'Express',
-      'Websocket',
-      'Typescript',
-    ],
-  }
+    keywords: ["Fullstack", "Vue", "Express", "Websocket", "Typescript"],
+  },
 ];
 ---
 
@@ -75,23 +68,14 @@ const projects: Project[] = [
   </head>
   <body class="h-full flex flex-col gap-4 max-w-3xl mx-auto mb-20">
     <Header />
-    <main class="h-full px-8 flex flex-col gap-4">
-      <motion.h1
-        client:load
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}>Projects</motion.h1
-      >
+    <main class="main">
+      <h1>Projects</h1>
       <section>
         <ul class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-2 gap-4">
           {
             projects.map((project, index) => {
               return (
-                <motion.li
-                  client:load
-                  key={index}
-                  className="bg-white rounded-lg shadow-md overflow-hidden [--scale:1] md:[--scale:1.1]"
-                  whileHover={{ scale: "var(--scale)" }}
-                >
+                <li class="bg-white rounded-lg shadow-md overflow-hidden [--scale:1] md:[--scale:1.1]">
                   <a
                     href={project.link}
                     class="flex flex-col gap-2"
@@ -117,7 +101,7 @@ const projects: Project[] = [
                       </ul>
                     </div>
                   </a>
-                </motion.li>
+                </li>
               );
             })
           }
