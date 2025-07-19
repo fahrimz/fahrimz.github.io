@@ -38,7 +38,7 @@ const Board = ({
     .reduce((acc, cur) => ({ ...acc, ...cur }), {});
 
   const CELL_SIZE = useMemo(
-    () => (screenWidth * 0.4) / BOARD_SIZE,
+    () => (screenWidth * 0.6) / BOARD_SIZE,
     [screenWidth]
   );
 
@@ -50,13 +50,6 @@ const Board = ({
       left: CELL_SIZE * coord.x + 8 * (coord.x + 1),
     }));
   }, [coords, CELL_SIZE]);
-
-  const initialCells = Array.from(
-    { length: BOARD_SIZE * BOARD_SIZE },
-    (_, index) => (
-      <Tile key={index} cellSize={CELL_SIZE} color={tileBaseColor} />
-    )
-  );
 
   useEffect(() => {
     if (isDev) {
@@ -286,44 +279,47 @@ const Board = ({
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       {/* board */}
-      <div className="absolute">
+      <div className="absolute flex flex-col items-center justify-center">
         <div
-          className="grid grid-cols-4 gap-2 border-8 rounded"
+          className="relative rounded"
           style={{
+            width: BOARD_SIZE * (CELL_SIZE + 8) + 8,
+            height: BOARD_SIZE * (CELL_SIZE + 8) + 8,
             backgroundColor: tileBaseColor,
-            borderColor: tileBaseColor,
           }}
         >
-          {initialCells}
+          {computedPositions.map((computedPosition, idx) => (
+            <motion.div
+              key={computedPosition.id}
+              className="absolute"
+              style={{
+                top: 0,
+                left: 0,
+              }}
+              initial={{
+                x: computedPosition.left,
+                y: computedPosition.top,
+                scale: 0.5,
+              }}
+              animate={{
+                scale: 1,
+                x: computedPosition.left,
+                y: computedPosition.top,
+              }}
+              transition={{
+                type: "spring",
+                bounce: 0.1,
+                duration: 0.6,
+              }}
+            >
+              <Tile
+                value={computedPosition.value}
+                cellSize={CELL_SIZE}
+                color={tileColorMap[computedPosition.value] || tileBaseColor}
+              />
+            </motion.div>
+          ))}
         </div>
-
-        {computedPositions.map((computedPosition, idx) => (
-          <motion.div
-            key={computedPosition.id}
-            className="absolute top-0 left-0"
-            initial={{
-              x: computedPosition.left,
-              y: computedPosition.top,
-              scale: 0.5,
-            }}
-            animate={{
-              scale: 1,
-              x: computedPosition.left,
-              y: computedPosition.top,
-            }}
-            transition={{
-              type: "spring",
-              bounce: 0.1,
-              duration: 0.6,
-            }}
-          >
-            <Tile
-              value={computedPosition.value}
-              cellSize={CELL_SIZE}
-              color={tileColorMap[computedPosition.value] || tileBaseColor}
-            />
-          </motion.div>
-        ))}
 
         <div className="mt-8">
           <ArrowControls
@@ -354,7 +350,7 @@ const Tile = ({
         height: cellSize,
         backgroundColor: color,
       }}
-      className="rounded flex items-center justify-center text-2xl font-bold text-white"
+      className="rounded flex items-center justify-center sm:text-2xl font-bold text-white"
     >
       {value !== undefined && <span>{value}</span>}
     </div>
@@ -398,16 +394,16 @@ const Game2048 = () => {
   ];
 
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
+    <div className="flex flex-col sm:flex-row items-center justify-center h-screen">
       {/* previous board state */}
-      {isDev && (
+      {/* {isDev && (
         <Board
           coords={prevCoords}
           setCoords={() => undefined}
           console={{ log: () => undefined }}
           colorArray={colorArrayRed}
         />
-      )}
+      )} */}
 
       {/* the real board currently being played */}
       <Board
