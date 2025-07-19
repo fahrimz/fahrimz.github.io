@@ -350,7 +350,7 @@ const Board = ({
         <div className="flex flex-row w-full items-center mb-4 justify-between">
           {/* biggest tile text */}
           <div
-            className="flex flex-row text-2xl font-bold gap-2"
+            className="flex flex-row sm:text-2xl font-bold gap-2"
             style={{ color: tileColorMap[biggestTile] || tileBaseColor }}
           >
             <span>Biggest Tile: </span>
@@ -372,7 +372,7 @@ const Board = ({
 
           {/* reset button */}
           <button
-            className="p-2 rounded text-white text-sm font-mono uppercase cursor-pointer"
+            className="p-2 rounded text-white text-xs sm:text-sm font-mono uppercase cursor-pointer"
             style={{backgroundColor: tileBaseColor}}
             onClick={() => {
               setIsGameOver(false);
