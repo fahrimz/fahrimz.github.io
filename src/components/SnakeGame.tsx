@@ -7,6 +7,7 @@ import AudioGameStart from "../assets/game-start.mp3";
 import ArrowControls from "./ArrowControls";
 import useScreenWidth from "../hooks/useScreenWidth";
 import useKeyboardControls from "../hooks/useKeyboardControls";
+import ConfirmRestart from "./ConfirmRestart";
 
 type Coord = [number, number];
 type Direction = "up" | "down" | "left" | "right";
@@ -50,46 +51,6 @@ function StartGameDialog({ onStart }: { onStart: (mode: GameMode) => void }) {
               </motion.button>
             ))}
           </div>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
-function ConfirmRestart({
-  score,
-  onRestart,
-  onCancel,
-}: {
-  score: number;
-  onRestart: () => void;
-  onCancel: () => void;
-}) {
-  return (
-    <motion.div
-      className="absolute bg-white z-50 shadow-xl rounded-lg"
-      key="modal"
-      initial={{ opacity: 0, y: "100%" }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <div className="flex flex-col justify-center items-center gap-8 w-xs md:w-xl h-fit p-8">
-        <h1 className="text-2xl font-semibold">Game Over!</h1>
-        <p className="text-lg">
-          Your score is <strong>{score}</strong>. Restart?
-        </p>
-        <div className="flex flex-row gap-4">
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
-            onClick={onCancel}
-          >
-            No
-          </button>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
-            onClick={onRestart}
-          >
-            Yes
-          </button>
         </div>
       </div>
     </motion.div>

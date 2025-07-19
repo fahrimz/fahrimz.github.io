@@ -3,6 +3,7 @@ import useScreenWidth from "../hooks/useScreenWidth";
 import useKeyboardControls from "../hooks/useKeyboardControls";
 import ArrowControls from "./ArrowControls";
 import { AnimatePresence, motion } from "motion/react";
+import ConfirmRestart from "./ConfirmRestart";
 
 type Direction = "up" | "down" | "left" | "right";
 type MoveStatus = "moved" | "merged" | "stay";
@@ -32,6 +33,8 @@ const Board = ({
   const tileColors = colorArray.slice(1);
 
   const screenWidth = useScreenWidth();
+  const [isGameOver, setIsGameOver] = useState(false);
+
   const highestTile = useMemo(
     () => Math.max(...coords.map((coord) => coord.value)),
     [coords]
@@ -67,18 +70,36 @@ const Board = ({
 
   useEffect(() => {
     console.log(
-      JSON.stringify(coords.map((z) => ({ x: z.x, y: z.y, value: z.value })))
-    );
-
-    console.log(
       JSON.stringify(
         coords.map(
-          (coord) => `${coord.id} => ${coord.value} at [${coord.x}, ${coord.y}]`
+          (coord) =>
+            `${coord.id} => ${coord.value} at [${coord.x}, ${coord.y}] (${coord.status})`
         ),
         null,
         2
       )
     );
+
+    if (coords.length < BOARD_SIZE * BOARD_SIZE) {
+      return;
+    }
+
+    // Check if any tile can move
+    const nonStayCoords = coords.filter((coord) => coord.status !== "stay");
+    const directions: Direction[] = ["up", "down", "left", "right"];
+    const canMove = nonStayCoords.some((coord) => {
+      return directions.some((direction) => {
+        const newCoordCandidate = moveCoord(coord, coords, direction);
+        return (
+          newCoordCandidate.status !== "stay" &&
+          !isCoordsEqual(coords, [...nonStayCoords, newCoordCandidate])
+        );
+      });
+    });
+
+    if (!canMove) {
+      setTimeout(() => setIsGameOver(true), 300);
+    }
   }, [coords]);
 
   const initialize = () => {
@@ -88,25 +109,59 @@ const Board = ({
   };
 
   const mockInitialize = () => {
+    // const array = [
+    //   { x: 0, y: 0, value: 2 },
+    //   { x: 1, y: 0, value: 2 },
+    //   { x: 2, y: 0, value: 2 },
+    //   { x: 3, y: 0, value: 2 },
+    //   { x: 0, y: 1, value: 2 },
+    //   { x: 1, y: 1, value: 2 },
+    //   { x: 3, y: 1, value: 2 },
+    //   { x: 1, y: 2, value: 8 },
+    //   { x: 3, y: 2, value: 8 },
+    // ];
+
     const array = [
-      { x: 0, y: 0, value: 2 },
-      { x: 1, y: 0, value: 2 },
-      { x: 2, y: 0, value: 2 },
-      { x: 3, y: 0, value: 2 },
+      { x: 0, y: 3, value: 8 },
+      { x: 0, y: 2, value: 4 },
       { x: 0, y: 1, value: 2 },
-      { x: 1, y: 1, value: 2 },
-      { x: 3, y: 1, value: 2 },
+      { x: 0, y: 0, value: 4 },
+      { x: 1, y: 3, value: 32 },
       { x: 1, y: 2, value: 8 },
+      { x: 1, y: 1, value: 256 },
+      { x: 1, y: 0, value: 2 },
+      { x: 2, y: 3, value: 8 },
+      { x: 2, y: 2, value: 16 },
+      { x: 2, y: 1, value: 32 },
+      { x: 2, y: 0, value: 256 },
+      { x: 3, y: 3, value: 2 },
       { x: 3, y: 2, value: 8 },
+      { x: 3, y: 1, value: 4 },
     ];
 
     setCoords(
       array.map((coord) => ({
         ...coord,
         id: generateCoordId(),
-        status: "moved",
+        status: "stay",
       }))
     );
+  };
+
+  const isCoordsEqual = (a: Coord[], b: Coord[]) => {
+    if (a.length !== b.length) return false;
+    return a.every((coord) => {
+      const otherCoord = b.find((c) => c.id === coord.id);
+      if (!otherCoord) return false;
+
+      const isSame =
+        coord.x === otherCoord.x &&
+        coord.y === otherCoord.y &&
+        coord.value === otherCoord.value &&
+        coord.status === otherCoord.status;
+
+      return isSame;
+    });
   };
 
   const getAvailableCoords = (coords: Coord[]) => {
@@ -116,10 +171,12 @@ const Board = ({
     for (let x = 0; x < BOARD_SIZE; x++) {
       for (let y = 0; y < BOARD_SIZE; y++) {
         if (!occupiedCoords.includes(`${x},${y}`)) {
+          const id = generateCoordId();
+          console.log(`adding new coord: ${id} at [${x}, ${y}]`);
           availableCoords.push({
             x,
             y,
-            id: generateCoordId(),
+            id,
             value: 2,
             status: "moved",
           });
@@ -181,8 +238,6 @@ const Board = ({
     );
 
     if (!collidedCoord) {
-      // No collision, move to new position
-      // return { ...newCoordCandidate, status: "moved" };
       return moveCoord(newCoordCandidate, coords, direction); // Recursively move until no collision
     }
 
@@ -267,7 +322,8 @@ const Board = ({
 
       setTimeout(() => {
         if (!newCoord) return;
-        setCoords((prevCoords) => [...prevCoords, newCoord]);
+        const newCoords = [...movedCoords, newCoord];
+        setCoords(newCoords);
       }, 215);
     },
     [coords]
@@ -359,6 +415,17 @@ const Board = ({
           />
         </div>
       </div>
+
+      {isGameOver && (
+        <ConfirmRestart
+          score={highestTile}
+          onRestart={() => {
+            setIsGameOver(false);
+            initialize();
+          }}
+          onCancel={() => setIsGameOver(false)}
+        />
+      )}
     </div>
   );
 };
