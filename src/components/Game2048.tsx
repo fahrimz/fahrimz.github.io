@@ -14,36 +14,36 @@ type Coord = {
 };
 
 const BOARD_SIZE = 4; // 4x4 grid. If you change this, adjust the grid-cols below accordingly.
-const LOWEST_TILE_VALUE = 2; // The lowest value for a tile in the game
-const HIGHEST_TILE_VALUE = 2048; // The highest value for a tile in the game
 
+const colorBase = "#ECFAE5";
+const colorArray = [
+  "#8CD090",
+  "#85C689",
+  "#7EBB82",
+  "#77B17B",
+  "#70A774",
+  "#699D6E",
+  "#619267",
+  "#5A8860",
+  "#537E59",
+  "#4C7452",
+  "#45694B",
+  "#3E5F44",
+];
+
+/**
+ * Get the color associated with a tile value.
+ * @param value The tile value.
+ * @returns The corresponding color as a string.
+ */
 const getColor = (value: number): string => {
-  switch (value) {
-    case LOWEST_TILE_VALUE:
-      return "#A1E3F9"; // Light blue
-    case 4:
-      return "#A1E3F9"; // Blue
-    case 8:
-      return "#7DD3FC"; // Darker blue
-    case 16:
-      return "#38BDF8"; // Even darker blue
-    case 32:
-      return "#0EA5E9"; // Dark blue
-    case 64:
-      return "#0284C7"; // Deep blue
-    case 128:
-      return "#0369A1"; // Darker deep blue
-    case 256:
-      return "#075985"; // Very dark blue
-    case 512:
-      return "#0C4A6E"; // Almost black blue
-    case 1024:
-      return "#1E40AF"; // Blackish blue
-    case HIGHEST_TILE_VALUE:
-      return "#1D4ED8"; // Deepest blue for the highest tile value
-    default:
-      return "#C4E1F6"; // Default color for unknown values
-  }
+  const colors: Record<number, string> = colorArray
+    .map((color, index) => ({
+      [Math.pow(2, index + 1)]: color, // 2, 4, 8, ..., 2048
+    }))
+    .reduce((acc, cur) => ({ ...acc, ...cur }), {});
+
+  return colors[value] || colorBase;
 };
 
 const Board = () => {
@@ -279,7 +279,7 @@ const Board = () => {
     <div className="relative w-full h-full flex items-center justify-center">
       {/* board */}
       <div className="absolute">
-        <div className="grid grid-cols-4 bg-blue-400 gap-2 border-8 border-blue-400 rounded">
+        <div className="grid grid-cols-4 bg-green-950 gap-2 border-8 border-green-950 rounded">
           {initialCells}
         </div>
 
@@ -324,7 +324,7 @@ const Tile = ({
       style={{
         width: cellSize,
         height: cellSize,
-        backgroundColor: color || "#C4E1F6",
+        backgroundColor: color || colorBase,
       }}
       className="rounded flex items-center justify-center text-2xl font-bold text-white"
     >
@@ -335,7 +335,7 @@ const Tile = ({
 
 const Game2048 = () => {
   return (
-    <div className="flex flex-col items-center justify-center h-screen bg-blue-100">
+    <div className="flex flex-col items-center justify-center h-screen">
       <Board />
     </div>
   );
