@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import useScreenWidth from "../hooks/useScreenWidth";
 import useKeyboardControls from "../hooks/useKeyboardControls";
 import ArrowControls from "./ArrowControls";
+import { motion } from "motion/react";
 
 type Direction = "up" | "down" | "left" | "right";
 type MoveStatus = "moved" | "merged" | "stay";
@@ -254,11 +255,17 @@ const Board = ({
         movedCoords.push(...newGroup);
       });
 
-      // create new tile at random coordinate
+      // move the tiles to the new positions
+      setCoords(movedCoords);
+
+      // create new tile at random coordinate after a few milliseconds
       const availableCoords = getAvailableCoords(movedCoords);
       const newCoord = createNewCoord(availableCoords);
 
-      setCoords(newCoord ? [...movedCoords, newCoord] : movedCoords);
+      setTimeout(() => {
+        if (!newCoord) return;
+        setCoords((prevCoords) => [...prevCoords, newCoord]);
+      }, 215);
     },
     [coords]
   );
@@ -281,17 +288,31 @@ const Board = ({
         </div>
 
         {computedPositions.map((computedPosition, idx) => (
-          <div
-            key={idx}
-            className="absolute"
-            style={{ top: computedPosition.top, left: computedPosition.left }}
+          <motion.div
+            key={computedPosition.id}
+            className="absolute top-0 left-0"
+            initial={{
+              x: computedPosition.left,
+              y: computedPosition.top,
+              scale: 0.5,
+            }}
+            animate={{
+              scale: 1,
+              x: computedPosition.left,
+              y: computedPosition.top,
+            }}
+            transition={{
+              type: "spring",
+              bounce: 0.1,
+              duration: 0.6,
+            }}
           >
             <Tile
               value={computedPosition.value}
               cellSize={CELL_SIZE}
               color={tileColorMap[computedPosition.value] || tileBaseColor}
             />
-          </div>
+          </motion.div>
         ))}
 
         <div className="mt-8">
@@ -335,7 +356,7 @@ const Game2048 = () => {
   const [coords, setCoords] = useState<Coord[]>([]);
 
   const colorArrayGreen = [
-    "#ECFAE5",
+    "var(--color-green-950)",
     "#8CD090",
     "#85C689",
     "#7EBB82",
