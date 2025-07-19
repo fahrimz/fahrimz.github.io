@@ -4,6 +4,10 @@ import { motion } from "motion/react";
 import AudioPickUp from "../assets/item-pick-up.mp3";
 import AudioGameOver from "../assets/game-over.mp3";
 import AudioGameStart from "../assets/game-start.mp3";
+import ArrowControls from "./ArrowControls";
+import useScreenWidth from "../hooks/useScreenWidth";
+import useKeyboardControls from "../hooks/useKeyboardControls";
+import ConfirmRestart from "./ConfirmRestart";
 
 type Coord = [number, number];
 type Direction = "up" | "down" | "left" | "right";
@@ -16,13 +20,6 @@ const directionToDegreeMap: Record<Direction, number> = {
   left: 90,
   up: 180,
   down: 360,
-};
-
-const keyToDirectionMap: Record<string, Direction> = {
-  ArrowUp: "up",
-  ArrowDown: "down",
-  ArrowLeft: "left",
-  ArrowRight: "right",
 };
 
 function StartGameDialog({ onStart }: { onStart: (mode: GameMode) => void }) {
@@ -60,48 +57,8 @@ function StartGameDialog({ onStart }: { onStart: (mode: GameMode) => void }) {
   );
 }
 
-function ConfirmRestart({
-  score,
-  onRestart,
-  onCancel,
-}: {
-  score: number;
-  onRestart: () => void;
-  onCancel: () => void;
-}) {
-  return (
-    <motion.div
-      className="absolute bg-white z-50 shadow-xl rounded-lg"
-      key="modal"
-      initial={{ opacity: 0, y: "100%" }}
-      animate={{ opacity: 1, y: 0 }}
-    >
-      <div className="flex flex-col justify-center items-center gap-8 w-xs md:w-xl h-fit p-8">
-        <h1 className="text-2xl font-semibold">Game Over!</h1>
-        <p className="text-lg">
-          Your score is <strong>{score}</strong>. Restart?
-        </p>
-        <div className="flex flex-row gap-4">
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
-            onClick={onCancel}
-          >
-            No
-          </button>
-          <button
-            className="bg-blue-500 text-white px-4 py-2 rounded-lg cursor-pointer"
-            onClick={onRestart}
-          >
-            Yes
-          </button>
-        </div>
-      </div>
-    </motion.div>
-  );
-}
-
 export default function SnakeGame() {
-  const [screenWidth, setScreenWidth] = useState(0);
+  const screenWidth = useScreenWidth();
   const BOARD_SIZE = 15; // board size, 15x15
   const CELL_SIZE = useMemo(
     () => (screenWidth * 0.8) / BOARD_SIZE,
@@ -306,17 +263,14 @@ export default function SnakeGame() {
     [snakeCoords, snakeHeadCoord, lastDirection, foodPosition, isPlaying]
   );
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!isPlaying) return;
-
-      const direction = keyToDirectionMap[e.key];
-      if (!direction) return;
-      if (direction === lastDirection) return;
-      moveSnake(direction);
-    },
-    [lastDirection, moveSnake, isPlaying]
-  );
+  // Use keyboard controls hook
+  useKeyboardControls({
+    onUp: () => moveSnake("up"),
+    onDown: () => moveSnake("down"),
+    onLeft: () => moveSnake("left"),
+    onRight: () => moveSnake("right"),
+    enabled: isPlaying,
+  });
 
   const startGame = (mode: GameMode) => {
     audioStartGame?.play();
@@ -333,14 +287,6 @@ export default function SnakeGame() {
       speed
     );
   }, [moveSnake, lastDirection, speed]);
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [snakeHeadCoord, handleKeyDown]);
 
   useEffect(() => {
     // start audio
@@ -361,8 +307,6 @@ export default function SnakeGame() {
   }, [gameMode]);
 
   useEffect(() => {
-    const { innerWidth, innerHeight } = window;
-    setScreenWidth(Math.min(innerWidth, innerHeight));
     setGameState("idle");
   }, []);
 
@@ -450,46 +394,12 @@ export default function SnakeGame() {
         ))}
       </div>
       {/* control for small devices */}
-      <div className="flex flex-col justify-center items-center md:hidden">
-        {/* up */}
-        <div className="flex flex-row">
-          <div className="size-20" />
-          <div
-            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
-            onClick={() => moveSnake("up")}
-          >
-            Up
-          </div>
-          <div className="size-20" />
-        </div>
-        {/* left right */}
-        <div className="flex flex-row">
-          <div
-            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
-            onClick={() => moveSnake("left")}
-          >
-            Left
-          </div>
-          <div className="size-20" />
-          <div
-            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center cursor-pointer"
-            onClick={() => moveSnake("right")}
-          >
-            Right
-          </div>
-        </div>
-        {/* down */}
-        <div className="flex flex-row">
-          <div className="size-20" />
-          <div
-            className="bg-blue-500 text-white rounded-lg shadow-md size-20 flex justify-center items-center"
-            onClick={() => moveSnake("down")}
-          >
-            Down
-          </div>
-          <div className="size-20" />
-        </div>
-      </div>
+      <ArrowControls
+        onUp={() => moveSnake("up")}
+        onRight={() => moveSnake("right")}
+        onDown={() => moveSnake("down")}
+        onLeft={() => moveSnake("left")}
+      />
 
       {showStartGame && <StartGameDialog onStart={startGame} />}
       {showConfirmRestart && (
