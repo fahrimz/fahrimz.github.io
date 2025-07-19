@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from "react";
-import useScreenWidth from "../hooks/screenWidth";
+import useScreenWidth from "../hooks/useScreenWidth";
+import useKeyboardControls from "../hooks/useKeyboardControls";
 import ArrowControls from "./ArrowControls";
 
 type Direction = "up" | "down" | "left" | "right";
@@ -264,6 +265,15 @@ const Board = () => {
     },
     [coords]
   );
+
+  // Add keyboard controls
+  useKeyboardControls({
+    onUp: () => onMove("up"),
+    onDown: () => onMove("down"),
+    onLeft: () => onMove("left"),
+    onRight: () => onMove("right"),
+    enabled: true,
+  });
 
   return (
     <div className="relative w-full h-full flex items-center justify-center">

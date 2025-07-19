@@ -5,7 +5,8 @@ import AudioPickUp from "../assets/item-pick-up.mp3";
 import AudioGameOver from "../assets/game-over.mp3";
 import AudioGameStart from "../assets/game-start.mp3";
 import ArrowControls from "./ArrowControls";
-import useScreenWidth from "../hooks/screenWidth";
+import useScreenWidth from "../hooks/useScreenWidth";
+import useKeyboardControls from "../hooks/useKeyboardControls";
 
 type Coord = [number, number];
 type Direction = "up" | "down" | "left" | "right";
@@ -18,13 +19,6 @@ const directionToDegreeMap: Record<Direction, number> = {
   left: 90,
   up: 180,
   down: 360,
-};
-
-const keyToDirectionMap: Record<string, Direction> = {
-  ArrowUp: "up",
-  ArrowDown: "down",
-  ArrowLeft: "left",
-  ArrowRight: "right",
 };
 
 function StartGameDialog({ onStart }: { onStart: (mode: GameMode) => void }) {
@@ -308,17 +302,14 @@ export default function SnakeGame() {
     [snakeCoords, snakeHeadCoord, lastDirection, foodPosition, isPlaying]
   );
 
-  const handleKeyDown = useCallback(
-    (e: KeyboardEvent) => {
-      if (!isPlaying) return;
-
-      const direction = keyToDirectionMap[e.key];
-      if (!direction) return;
-      if (direction === lastDirection) return;
-      moveSnake(direction);
-    },
-    [lastDirection, moveSnake, isPlaying]
-  );
+  // Use keyboard controls hook
+  useKeyboardControls({
+    onUp: () => moveSnake("up"),
+    onDown: () => moveSnake("down"),
+    onLeft: () => moveSnake("left"),
+    onRight: () => moveSnake("right"),
+    enabled: isPlaying,
+  });
 
   const startGame = (mode: GameMode) => {
     audioStartGame?.play();
@@ -335,14 +326,6 @@ export default function SnakeGame() {
       speed
     );
   }, [moveSnake, lastDirection, speed]);
-
-  useEffect(() => {
-    window.addEventListener("keydown", handleKeyDown);
-
-    return () => {
-      window.removeEventListener("keydown", handleKeyDown);
-    };
-  }, [snakeHeadCoord, handleKeyDown]);
 
   useEffect(() => {
     // start audio
