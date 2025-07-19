@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import useScreenWidth from "../hooks/useScreenWidth";
 import useKeyboardControls from "../hooks/useKeyboardControls";
 import ArrowControls from "./ArrowControls";
-import { motion } from "motion/react";
+import { AnimatePresence, motion } from "motion/react";
 
 type Direction = "up" | "down" | "left" | "right";
 type MoveStatus = "moved" | "merged" | "stay";
@@ -28,9 +28,15 @@ const Board = ({
   console: { log: (message: string) => void };
   colorArray: string[];
 }) => {
-  const screenWidth = useScreenWidth();
   const tileBaseColor = colorArray[0];
   const tileColors = colorArray.slice(1);
+
+  const screenWidth = useScreenWidth();
+  const highestTile = useMemo(
+    () => Math.max(...coords.map((coord) => coord.value)),
+    [coords]
+  );
+
   const tileColorMap: Record<number, string> = tileColors
     .map((color, index) => ({
       [Math.pow(2, index + 1)]: color, // 2, 4, 8, ..., 2048
@@ -280,6 +286,29 @@ const Board = ({
     <div className="relative w-full h-full flex items-center justify-center">
       {/* board */}
       <div className="absolute flex flex-col items-center justify-center">
+        <div className="flex flex-row w-full">
+          <div
+            className="flex flex-row text-2xl font-bold mb-4 gap-2"
+            style={{ color: tileColorMap[highestTile] || tileBaseColor }}
+          >
+            <span>Highest Tile: </span>
+            <AnimatePresence mode="wait">
+              <motion.span
+                key={highestTile}
+                initial={{
+                  opacity: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                }}
+                exit={{ opacity: 0 }}
+              >
+                {highestTile}
+              </motion.span>
+            </AnimatePresence>
+          </div>
+        </div>
+
         <div
           className="relative rounded"
           style={{
