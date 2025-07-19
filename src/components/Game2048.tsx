@@ -283,7 +283,10 @@ const Board = ({
     <div className="relative w-full h-full flex items-center justify-center">
       {/* board */}
       <div className="absolute">
-        <div className="grid grid-cols-4 bg-green-950 gap-2 border-8 border-green-950 rounded">
+        <div className="grid grid-cols-4 gap-2 border-8 rounded" style={{
+          backgroundColor: tileBaseColor,
+          borderColor: tileBaseColor,
+        }}>
           {initialCells}
         </div>
 
@@ -372,7 +375,7 @@ const Game2048 = () => {
   ];
 
   const colorArrayRed = [
-    "#F5F0EE",
+    "var(--color-red-950)",
     "#EEE2DF",
     "#E8D3D1",
     "#E1C5C2",
