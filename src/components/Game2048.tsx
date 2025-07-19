@@ -121,28 +121,33 @@ const Board = ({
     //   { x: 3, y: 2, value: 8 },
     // ];
 
+    // const array = [
+    //   { x: 0, y: 3, value: 8 },
+    //   { x: 0, y: 2, value: 4 },
+    //   { x: 0, y: 1, value: 2 },
+    //   { x: 0, y: 0, value: 4 },
+    //   { x: 1, y: 3, value: 32 },
+    //   { x: 1, y: 2, value: 8 },
+    //   { x: 1, y: 1, value: 256 },
+    //   { x: 1, y: 0, value: 2 },
+    //   { x: 2, y: 3, value: 8 },
+    //   { x: 2, y: 2, value: 16 },
+    //   { x: 2, y: 1, value: 32 },
+    //   { x: 2, y: 0, value: 256 },
+    //   { x: 3, y: 3, value: 2 },
+    //   { x: 3, y: 2, value: 8 },
+    //   { x: 3, y: 1, value: 4 },
+    // ];
+
     const array = [
-      { x: 0, y: 3, value: 8 },
-      { x: 0, y: 2, value: 4 },
-      { x: 0, y: 1, value: 2 },
-      { x: 0, y: 0, value: 4 },
-      { x: 1, y: 3, value: 32 },
-      { x: 1, y: 2, value: 8 },
-      { x: 1, y: 1, value: 256 },
-      { x: 1, y: 0, value: 2 },
-      { x: 2, y: 3, value: 8 },
-      { x: 2, y: 2, value: 16 },
-      { x: 2, y: 1, value: 32 },
-      { x: 2, y: 0, value: 256 },
-      { x: 3, y: 3, value: 2 },
-      { x: 3, y: 2, value: 8 },
-      { x: 3, y: 1, value: 4 },
-    ];
+      {x: 0, y: 0, value: 2, id: 'a'},
+      {x: 3, y: 0, value: 2, id: 'b'},
+    ]
 
     setCoords(
       array.map((coord) => ({
         ...coord,
-        id: generateCoordId(),
+        id: coord.id || generateCoordId(),
         status: "stay",
       }))
     );
@@ -172,7 +177,6 @@ const Board = ({
       for (let y = 0; y < BOARD_SIZE; y++) {
         if (!occupiedCoords.includes(`${x},${y}`)) {
           const id = generateCoordId();
-          console.log(`adding new coord: ${id} at [${x}, ${y}]`);
           availableCoords.push({
             x,
             y,
@@ -256,7 +260,7 @@ const Board = ({
     if (collidedCoord.value === coord.value) {
       // Merge the tiles by increasing the value and removing the old tile
       const mergedCoord = {
-        ...collidedCoord,
+        ...newCoordCandidate,
         value: coord.value * 2,
       };
       return { ...mergedCoord, status: "merged" };
@@ -302,6 +306,7 @@ const Board = ({
                   c.x === newCoordCandidate.x && c.y === newCoordCandidate.y
               );
               if (existingCoord) {
+                existingCoord.id = newCoordCandidate.id; // Update ID to the new one
                 existingCoord.value = newCoordCandidate.value; // Merge the values
                 existingCoord.status = "merged"; // Update status to merged
               }
