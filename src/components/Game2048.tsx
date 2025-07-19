@@ -15,43 +15,28 @@ type Coord = {
 
 const BOARD_SIZE = 4; // 4x4 grid. If you change this, adjust the grid-cols below accordingly.
 
-const colorBase = "#ECFAE5";
-const colorArray = [
-  "#8CD090",
-  "#85C689",
-  "#7EBB82",
-  "#77B17B",
-  "#70A774",
-  "#699D6E",
-  "#619267",
-  "#5A8860",
-  "#537E59",
-  "#4C7452",
-  "#45694B",
-  "#3E5F44",
-];
-
-/**
- * Get the color associated with a tile value.
- * @param value The tile value.
- * @returns The corresponding color as a string.
- */
-const getColor = (value: number): string => {
-  const colors: Record<number, string> = colorArray
+const Board = ({
+  coords,
+  setCoords,
+  console,
+  colorArray,
+}: {
+  coords: Coord[];
+  setCoords: React.Dispatch<React.SetStateAction<Coord[]>>;
+  console: { log: (message: string) => void };
+  colorArray: string[];
+}) => {
+  const screenWidth = useScreenWidth();
+  const tileBaseColor = colorArray[0];
+  const tileColors = colorArray.slice(1);
+  const tileColorMap: Record<number, string> = tileColors
     .map((color, index) => ({
       [Math.pow(2, index + 1)]: color, // 2, 4, 8, ..., 2048
     }))
     .reduce((acc, cur) => ({ ...acc, ...cur }), {});
 
-  return colors[value] || colorBase;
-};
-
-const Board = () => {
-  const screenWidth = useScreenWidth();
-  const [coords, setCoords] = useState<Coord[]>([]);
-
   const CELL_SIZE = useMemo(
-    () => (screenWidth * 0.8) / BOARD_SIZE,
+    () => (screenWidth * 0.4) / BOARD_SIZE,
     [screenWidth]
   );
 
@@ -66,15 +51,21 @@ const Board = () => {
 
   const initialCells = Array.from(
     { length: BOARD_SIZE * BOARD_SIZE },
-    (_, index) => <Tile key={index} cellSize={CELL_SIZE} />
+    (_, index) => (
+      <Tile key={index} cellSize={CELL_SIZE} color={tileBaseColor} />
+    )
   );
 
   useEffect(() => {
-    initialize();
-    // mockInitialize();
+    // initialize();
+    mockInitialize();
   }, []);
 
   useEffect(() => {
+    console.log(
+      JSON.stringify(coords.map((z) => ({ x: z.x, y: z.y, value: z.value })))
+    );
+
     console.log(
       JSON.stringify(
         coords.map(
@@ -93,17 +84,25 @@ const Board = () => {
   };
 
   const mockInitialize = () => {
-    setCoords([
-      { id: generateCoordId(), x: 0, y: 0, value: 4, status: "moved" },
-      { id: generateCoordId(), x: 1, y: 0, value: 2, status: "moved" },
-      { id: generateCoordId(), x: 2, y: 0, value: 2, status: "moved" },
-      { id: generateCoordId(), x: 3, y: 0, value: 2, status: "moved" },
-      { id: generateCoordId(), x: 0, y: 1, value: 2, status: "moved" },
-      { id: generateCoordId(), x: 1, y: 1, value: 2, status: "moved" },
-      { id: generateCoordId(), x: 3, y: 1, value: 2, status: "moved" },
-      { id: generateCoordId(), x: 1, y: 2, value: 8, status: "moved" },
-      { id: generateCoordId(), x: 3, y: 2, value: 8, status: "moved" },
-    ]);
+    const array = [
+      { x: 0, y: 0, value: 2 },
+      { x: 1, y: 0, value: 2 },
+      { x: 2, y: 0, value: 2 },
+      { x: 3, y: 0, value: 2 },
+      { x: 0, y: 1, value: 2 },
+      { x: 1, y: 1, value: 2 },
+      { x: 3, y: 1, value: 2 },
+      { x: 1, y: 2, value: 8 },
+      { x: 3, y: 2, value: 8 },
+    ];
+
+    setCoords(
+      array.map((coord) => ({
+        ...coord,
+        id: generateCoordId(),
+        status: "moved",
+      }))
+    );
   };
 
   const getAvailableCoords = (coords: Coord[]) => {
@@ -159,11 +158,6 @@ const Board = () => {
     return null;
   };
 
-  const tileCanMove = (coord: Coord, direction: Direction): boolean => {
-    const newCoord = getNewCoord(coord, direction);
-    return Boolean(newCoord);
-  };
-
   const moveCoord = (
     coord: Coord,
     coords: Coord[],
@@ -183,7 +177,9 @@ const Board = () => {
     );
 
     if (!collidedCoord) {
-      return { ...newCoordCandidate, status: "moved" }; // No collision, move to new position
+      // No collision, move to new position
+      // return { ...newCoordCandidate, status: "moved" };
+      return moveCoord(newCoordCandidate, coords, direction); // Recursively move until no collision
     }
 
     if (
@@ -214,7 +210,8 @@ const Board = () => {
   const onMove = useCallback(
     (direction: Direction) => {
       // TODO:
-      // change from moving per-tile to sliding until boundary or collision
+      // [done] change from moving per-tile to sliding until boundary or collision
+      // when there's [2, 2, 2, 2] and move left, it should become [4, 2, 2, 0]
 
       // group coordinates by direction first, then move each group
       const isVertical = direction === "up" || direction === "down";
@@ -292,7 +289,7 @@ const Board = () => {
             <Tile
               value={computedPosition.value}
               cellSize={CELL_SIZE}
-              color={getColor(computedPosition.value)}
+              color={tileColorMap[computedPosition.value] || tileBaseColor}
             />
           </div>
         ))}
@@ -317,14 +314,14 @@ const Tile = ({
 }: {
   value?: number;
   cellSize: number;
-  color?: string;
+  color: string;
 }) => {
   return (
     <div
       style={{
         width: cellSize,
         height: cellSize,
-        backgroundColor: color || colorBase,
+        backgroundColor: color,
       }}
       className="rounded flex items-center justify-center text-2xl font-bold text-white"
     >
@@ -334,9 +331,61 @@ const Tile = ({
 };
 
 const Game2048 = () => {
+  const [prevCoords, setPrevCoords] = useState<Coord[]>([]);
+  const [coords, setCoords] = useState<Coord[]>([]);
+
+  const colorArrayGreen = [
+    "#ECFAE5",
+    "#8CD090",
+    "#85C689",
+    "#7EBB82",
+    "#77B17B",
+    "#70A774",
+    "#699D6E",
+    "#619267",
+    "#5A8860",
+    "#537E59",
+    "#4C7452",
+    "#45694B",
+    "#3E5F44",
+  ];
+
+  const colorArrayRed = [
+    "#F5F0EE",
+    "#EEE2DF",
+    "#E8D3D1",
+    "#E1C5C2",
+    "#DBB6B3",
+    "#D4A8A5",
+    "#CE9996",
+    "#C78B87",
+    "#C07C79",
+    "#BA6E6A",
+    "#B35F5B",
+    "#AD514D",
+    "#A6423E",
+  ];
+
   return (
-    <div className="flex flex-col items-center justify-center h-screen">
-      <Board />
+    <div className="flex flex-row items-center justify-center h-screen">
+      {/* previous board state */}
+      <Board
+        coords={prevCoords}
+        setCoords={() => undefined}
+        console={{ log: () => undefined }}
+        colorArray={colorArrayRed}
+      />
+
+      {/* the real board currently being played */}
+      <Board
+        coords={coords}
+        setCoords={(newCoords) => {
+          setPrevCoords(coords); // Save current state as previous
+          setCoords(newCoords);
+        }}
+        console={console}
+        colorArray={colorArrayGreen}
+      />
     </div>
   );
 };
