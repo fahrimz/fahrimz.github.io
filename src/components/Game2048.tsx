@@ -35,7 +35,7 @@ const Board = ({
   const screenWidth = useScreenWidth();
   const [isGameOver, setIsGameOver] = useState(false);
 
-  const highestTile = useMemo(
+  const biggestTile = useMemo(
     () => Math.max(...coords.map((coord) => coord.value)),
     [coords]
   );
@@ -140,9 +140,9 @@ const Board = ({
     // ];
 
     const array = [
-      {x: 0, y: 0, value: 2, id: 'a'},
-      {x: 3, y: 0, value: 2, id: 'b'},
-    ]
+      { x: 0, y: 0, value: 2, id: "a" },
+      { x: 3, y: 0, value: 2, id: "b" },
+    ];
 
     setCoords(
       array.map((coord) => ({
@@ -347,15 +347,16 @@ const Board = ({
     <div className="relative w-full h-full flex items-center justify-center">
       {/* board */}
       <div className="absolute flex flex-col items-center justify-center">
-        <div className="flex flex-row w-full">
+        <div className="flex flex-row w-full items-center mb-4 justify-between">
+          {/* biggest tile text */}
           <div
-            className="flex flex-row text-2xl font-bold mb-4 gap-2"
-            style={{ color: tileColorMap[highestTile] || tileBaseColor }}
+            className="flex flex-row text-2xl font-bold gap-2"
+            style={{ color: tileColorMap[biggestTile] || tileBaseColor }}
           >
-            <span>Highest Tile: </span>
+            <span>Biggest Tile: </span>
             <AnimatePresence mode="wait">
               <motion.span
-                key={highestTile}
+                key={biggestTile}
                 initial={{
                   opacity: 0,
                 }}
@@ -364,10 +365,22 @@ const Board = ({
                 }}
                 exit={{ opacity: 0 }}
               >
-                {highestTile}
+                {biggestTile}
               </motion.span>
             </AnimatePresence>
           </div>
+
+          {/* reset button */}
+          <button
+            className="p-2 rounded text-white text-sm font-mono uppercase cursor-pointer"
+            style={{backgroundColor: tileBaseColor}}
+            onClick={() => {
+              setIsGameOver(false);
+              initialize();
+            }}
+          >
+            Reset
+          </button>
         </div>
 
         <div
@@ -423,7 +436,7 @@ const Board = ({
 
       {isGameOver && (
         <ConfirmRestart
-          score={highestTile}
+          score={biggestTile}
           onRestart={() => {
             setIsGameOver(false);
             initialize();
