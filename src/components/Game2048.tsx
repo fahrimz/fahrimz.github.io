@@ -92,7 +92,7 @@ const Board = ({
         const newCoordCandidate = moveCoord(coord, coords, direction);
         return (
           newCoordCandidate.status !== "stay" &&
-          !isCoordsEqual(coords, [...nonStayCoords, newCoordCandidate])
+          !isCoordsEqual(coords, [...nonStayCoords, newCoordCandidate], true)
         );
       });
     });
@@ -139,9 +139,16 @@ const Board = ({
     //   { x: 3, y: 1, value: 4 },
     // ];
 
+    // top
+    // const array = [
+    //   { x: 0, y: 0, value: 2, id: "a" },
+    //   { x: 3, y: 0, value: 2, id: "b" },
+    // ];
+
+    // left
     const array = [
       { x: 0, y: 0, value: 2, id: "a" },
-      { x: 3, y: 0, value: 2, id: "b" },
+      { x: 0, y: 1, value: 2, id: "b" },
     ];
 
     setCoords(
@@ -153,17 +160,20 @@ const Board = ({
     );
   };
 
-  const isCoordsEqual = (a: Coord[], b: Coord[]) => {
+  const isCoordsEqual = (a: Coord[], b: Coord[], checkStatus: boolean) => {
     if (a.length !== b.length) return false;
     return a.every((coord) => {
       const otherCoord = b.find((c) => c.id === coord.id);
       if (!otherCoord) return false;
 
-      const isSame =
-        coord.x === otherCoord.x &&
-        coord.y === otherCoord.y &&
-        coord.value === otherCoord.value &&
-        coord.status === otherCoord.status;
+      const isSame = checkStatus
+        ? coord.x === otherCoord.x &&
+          coord.y === otherCoord.y &&
+          coord.value === otherCoord.value &&
+          coord.status === otherCoord.status
+        : coord.x === otherCoord.x &&
+          coord.y === otherCoord.y &&
+          coord.value === otherCoord.value;
 
       return isSame;
     });
@@ -318,6 +328,12 @@ const Board = ({
         movedCoords.push(...newGroup);
       });
 
+      const isSame = isCoordsEqual(coords, movedCoords, false);
+      if (isSame) {
+        console.log("No movement detected, returning early.");
+        return;
+      }
+
       // move the tiles to the new positions
       setCoords(movedCoords);
 
@@ -373,7 +389,7 @@ const Board = ({
           {/* reset button */}
           <button
             className="p-2 rounded text-white text-xs sm:text-sm font-mono uppercase cursor-pointer"
-            style={{backgroundColor: tileBaseColor}}
+            style={{ backgroundColor: tileBaseColor }}
             onClick={() => {
               setIsGameOver(false);
               initialize();
@@ -472,7 +488,6 @@ const Tile = ({
 };
 
 const Game2048 = () => {
-  const [prevCoords, setPrevCoords] = useState<Coord[]>([]);
   const [coords, setCoords] = useState<Coord[]>([]);
 
   const colorArrayGreen = [
@@ -491,41 +506,11 @@ const Game2048 = () => {
     "#3E5F44",
   ];
 
-  const colorArrayRed = [
-    "var(--color-red-950)",
-    "#EEE2DF",
-    "#E8D3D1",
-    "#E1C5C2",
-    "#DBB6B3",
-    "#D4A8A5",
-    "#CE9996",
-    "#C78B87",
-    "#C07C79",
-    "#BA6E6A",
-    "#B35F5B",
-    "#AD514D",
-    "#A6423E",
-  ];
-
   return (
     <div className="flex flex-col sm:flex-row items-center justify-center h-screen">
-      {/* previous board state */}
-      {/* {isDev && (
-        <Board
-          coords={prevCoords}
-          setCoords={() => undefined}
-          console={{ log: () => undefined }}
-          colorArray={colorArrayRed}
-        />
-      )} */}
-
-      {/* the real board currently being played */}
       <Board
         coords={coords}
-        setCoords={(newCoords) => {
-          setPrevCoords(coords); // Save current state as previous
-          setCoords(newCoords);
-        }}
+        setCoords={setCoords}
         console={isDev ? console : { log: () => undefined }}
         colorArray={colorArrayGreen}
       />
