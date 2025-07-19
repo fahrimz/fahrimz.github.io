@@ -14,6 +14,7 @@ type Coord = {
   status: MoveStatus;
 };
 
+const isDev = import.meta.env.DEV;
 const BOARD_SIZE = 4; // 4x4 grid. If you change this, adjust the grid-cols below accordingly.
 
 const Board = ({
@@ -58,8 +59,11 @@ const Board = ({
   );
 
   useEffect(() => {
-    // initialize();
-    mockInitialize();
+    if (isDev) {
+      mockInitialize();
+    } else {
+      initialize();
+    }
   }, []);
 
   useEffect(() => {
@@ -283,10 +287,13 @@ const Board = ({
     <div className="relative w-full h-full flex items-center justify-center">
       {/* board */}
       <div className="absolute">
-        <div className="grid grid-cols-4 gap-2 border-8 rounded" style={{
-          backgroundColor: tileBaseColor,
-          borderColor: tileBaseColor,
-        }}>
+        <div
+          className="grid grid-cols-4 gap-2 border-8 rounded"
+          style={{
+            backgroundColor: tileBaseColor,
+            borderColor: tileBaseColor,
+          }}
+        >
           {initialCells}
         </div>
 
@@ -391,14 +398,16 @@ const Game2048 = () => {
   ];
 
   return (
-    <div className="flex flex-row items-center justify-center h-screen">
+    <div className="flex flex-col items-center justify-center h-screen">
       {/* previous board state */}
-      <Board
-        coords={prevCoords}
-        setCoords={() => undefined}
-        console={{ log: () => undefined }}
-        colorArray={colorArrayRed}
-      />
+      {isDev && (
+        <Board
+          coords={prevCoords}
+          setCoords={() => undefined}
+          console={{ log: () => undefined }}
+          colorArray={colorArrayRed}
+        />
+      )}
 
       {/* the real board currently being played */}
       <Board
@@ -407,7 +416,7 @@ const Game2048 = () => {
           setPrevCoords(coords); // Save current state as previous
           setCoords(newCoords);
         }}
-        console={console}
+        console={isDev ? console : { log: () => undefined }}
         colorArray={colorArrayGreen}
       />
     </div>
