@@ -34,6 +34,7 @@ const Board = ({
 
   const screenWidth = useScreenWidth();
   const [isGameOver, setIsGameOver] = useState(false);
+  const [isMoving, setIsMoving] = useState(false);
 
   const biggestTile = useMemo(
     () => Math.max(...coords.map((coord) => coord.value)),
@@ -285,6 +286,13 @@ const Board = ({
       // [done] change from moving per-tile to sliding until boundary or collision
       // when there's [2, 2, 2, 2] and move left, it should become [4, 2, 2, 0]
 
+      if (isMoving) {
+        console.log("Already moving, ignoring this move.");
+        return;
+      }
+
+      setIsMoving(true);
+
       // group coordinates by direction first, then move each group
       const isVertical = direction === "up" || direction === "down";
       const groupedCoords = coords.reduce((acc, coord) => {
@@ -342,9 +350,14 @@ const Board = ({
       const newCoord = createNewCoord(availableCoords);
 
       setTimeout(() => {
-        if (!newCoord) return;
+        if (!newCoord) {
+          setIsMoving(false);
+          return;
+        }
+
         const newCoords = [...movedCoords, newCoord];
         setCoords(newCoords);
+        setIsMoving(false);
       }, 215);
     },
     [coords]
@@ -362,7 +375,12 @@ const Board = ({
   return (
     <div className="relative w-full h-full flex items-center justify-center">
       {/* board */}
-      <div className="absolute flex flex-col items-center justify-center">
+      <motion.div
+        className="absolute flex flex-col items-center justify-center"
+        initial={{ y: "100vh", opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
+      >
         <div className="flex flex-row w-full items-center mb-4 justify-between">
           {/* biggest tile text */}
           <div
@@ -428,7 +446,7 @@ const Board = ({
               transition={{
                 type: "spring",
                 bounce: 0.1,
-                duration: 0.6,
+                duration: 0.5,
               }}
             >
               <Tile
@@ -448,7 +466,7 @@ const Board = ({
             onRight={() => onMove("right")}
           />
         </div>
-      </div>
+      </motion.div>
 
       {isGameOver && (
         <ConfirmRestart
