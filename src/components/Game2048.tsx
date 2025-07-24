@@ -85,14 +85,13 @@ const Board = ({
     }
 
     // Check if any tile can move
-    const nonStayCoords = coords.filter((coord) => coord.status !== "stay");
     const directions: Direction[] = ["up", "down", "left", "right"];
-    const canMove = nonStayCoords.some((coord) => {
+    const canMove = coords.some((coord) => {
       return directions.some((direction) => {
         const newCoordCandidate = moveCoord(coord, coords, direction);
         return (
           newCoordCandidate.status !== "stay" &&
-          !isCoordsEqual(coords, [...nonStayCoords, newCoordCandidate], true)
+          !isCoordsEqual(coords, [...coords, newCoordCandidate], true)
         );
       });
     });
@@ -330,6 +329,7 @@ const Board = ({
 
       const isSame = isCoordsEqual(coords, movedCoords, false);
       if (isSame) {
+        console.log(JSON.stringify(movedCoords, null, 2));
         console.log("No movement detected, returning early.");
         return;
       }
