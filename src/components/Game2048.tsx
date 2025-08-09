@@ -36,6 +36,8 @@ const Board = ({
   const [isGameOver, setIsGameOver] = useState(false);
   const [isMoving, setIsMoving] = useState(false);
 
+  const [score, setScore] = useState(0);
+
   const biggestTile = useMemo(
     () => Math.max(...coords.map((coord) => coord.value)),
     [coords]
@@ -103,6 +105,8 @@ const Board = ({
   }, [coords]);
 
   const initialize = () => {
+    setScore(0);
+
     const availableCoords = getAvailableCoords([]);
     const newCoord = createNewCoord(availableCoords)!;
     setCoords([newCoord]);
@@ -158,6 +162,11 @@ const Board = ({
         status: "stay",
       }))
     );
+  };
+
+  const addScoreOnTileMerged = (tileValue: number) => {
+    const isNewHighestTile = tileValue > biggestTile;
+    setScore((prevScore) => prevScore + tileValue * (isNewHighestTile ? 2 : 1));
   };
 
   const isCoordsEqual = (a: Coord[], b: Coord[], checkStatus: boolean) => {
@@ -327,6 +336,7 @@ const Board = ({
                 existingCoord.value = newCoordCandidate.value; // Merge the values
                 existingCoord.status = "merged"; // Update status to merged
               }
+              addScoreOnTileMerged(newCoordCandidate.value);
               break;
             default:
               newGroup.push(newCoordCandidate);
@@ -382,15 +392,15 @@ const Board = ({
         transition={{ type: "spring", bounce: 0.2, duration: 0.5 }}
       >
         <div className="flex flex-row w-full items-center mb-4 justify-between">
-          {/* biggest tile text */}
+          {/* Score */}
           <div
             className="flex flex-row sm:text-2xl font-bold gap-2"
             style={{ color: tileColorMap[biggestTile] || tileBaseColor }}
           >
-            <span>Biggest Tile: </span>
+            <span>Score: </span>
             <AnimatePresence mode="wait">
               <motion.span
-                key={biggestTile}
+                key={score}
                 initial={{
                   opacity: 0,
                 }}
@@ -399,7 +409,7 @@ const Board = ({
                 }}
                 exit={{ opacity: 0 }}
               >
-                {biggestTile}
+                {score}
               </motion.span>
             </AnimatePresence>
           </div>
@@ -470,7 +480,7 @@ const Board = ({
 
       {isGameOver && (
         <ConfirmRestart
-          score={biggestTile}
+          score={score}
           onRestart={() => {
             setIsGameOver(false);
             initialize();
