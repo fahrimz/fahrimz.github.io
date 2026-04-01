@@ -1,0 +1,101 @@
+---
+title: 'Fixing React Native RefreshControl Color'
+description: 'A workaround for the iOS RefreshControl tintColor bug where the color is intermittently ignored.'
+pubDate: 'Apr 01 2026'
+---
+
+If you've ever used `RefreshControl` in React Native on iOS, you might have noticed that the spinner color doesn't always match what you set with `tintColor`. In this article, I'll explain the problem and share a simple workaround.
+
+<br />
+
+#### The Problem
+
+On iOS, `RefreshControl` wraps the native `UIRefreshControl`, which renders an `ActivityIndicatorView`. Without a custom `tintColor`, the system uses a semantic default color based on the device's appearance mode:
+
+- **Light mode**: dark gray spinner
+- **Dark mode**: light gray spinner
+
+<br />
+
+This is fine if you're okay with the default. But when you set `tintColor="white"` for example, you'd expect the spinner to always be white. Unfortunately, that's not always the case.
+
+<br />
+
+The `tintColor` prop is intermittently ignored, especially on the **first render**. This is a known bug related to the **New Architecture (Fabric)** and has been reported multiple times on the React Native GitHub:
+
+- [#53987](https://github.com/facebook/react-native/issues/53987) — `tintColor` prop not respected (RN 0.81.4, still open)
+- [#48502](https://github.com/facebook/react-native/issues/48502) — `tintColor` sometimes doesn't work on first render (RN 0.76.3)
+- [#46631](https://github.com/facebook/react-native/issues/46631) — `tintColor` not working in ScrollView (RN 0.75.2)
+
+<br />
+
+There have been fixes merged, but the issue keeps resurfacing in newer versions. If you're hitting this bug, here's a reliable workaround.
+
+<br />
+
+#### The Workaround
+
+The idea is simple: start with a transparent color, then apply the actual color after a short delay using `setTimeout`. This bypasses the native rendering timing issue where the `tintColor` gets overwritten during the initial mount.
+
+```typescript
+import { useEffect, useState } from "react";
+import { RefreshControl as RNRefreshControl } from "react-native";
+
+export const RefreshControl = (
+  props: React.ComponentProps<typeof RNRefreshControl>,
+) => {
+  const selectedColor = "white";
+  const [refreshColor, setRefreshColor] = useState("transparent");
+
+  useEffect(() => {
+    const timer = setTimeout(() => setRefreshColor(selectedColor), 50);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <RNRefreshControl
+      tintColor={refreshColor}
+      colors={[refreshColor]}
+      {...props}
+    />
+  );
+};
+```
+
+<br />
+
+A few things to note:
+
+- We initialize `refreshColor` to `"transparent"` so the spinner is invisible during the problematic first render.
+- The `setTimeout` with a 50ms delay is enough to bypass the native rendering issue.
+- We also set `colors` (Android prop) to the same value for consistency across platforms.
+- All other props are passed through via `{...props}`, so it works as a drop-in replacement.
+
+<br />
+
+#### Usage
+
+Use it just like the regular `RefreshControl`:
+
+```typescript
+import { FlatList } from "react-native";
+import { RefreshControl } from "./components/RefreshControl";
+
+<FlatList
+  data={data}
+  refreshControl={
+    <RefreshControl refreshing={refreshing} onRefresh={onRefresh} />
+  }
+  renderItem={renderItem}
+/>
+```
+
+<br />
+
+#### Why This Works
+
+On iOS, the native `UIRefreshControl` seems to reset or ignore the `tintColor` during the initial component mount in the New Architecture. By delaying the color application slightly, we ensure the prop is set after the native component has fully initialized. The 50ms delay is imperceptible to users since the spinner isn't typically visible at mount time anyway.
+
+<br />
+
+It's a bit hacky, but it works reliably. Hopefully the React Native team will fix this properly in a future release.
