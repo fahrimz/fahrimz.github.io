@@ -104,6 +104,8 @@ article li {
 article table {
 	width: 100%;
 	border-collapse: collapse;
+	display: block;
+	overflow-x: auto;
 }
 
 article th, article td {
