@@ -101,6 +101,21 @@ article li {
 	margin-bottom: 0.25rem;
 }
 
+article table {
+	width: 100%;
+	border-collapse: collapse;
+}
+
+article th, article td {
+	border: 1px solid rgba(var(--gray-light), 1);
+	padding: 0.5rem 0.75rem;
+	text-align: left;
+}
+
+article th {
+	font-weight: 700;
+}
+
 .main {
 	@apply h-full px-8 flex flex-col gap-4 mt-4;
 }
