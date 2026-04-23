@@ -76,7 +76,8 @@ xcodebuild archive \
   -scheme YourApp \
   -configuration Release \
   -archivePath ./build/YourApp.xcarchive \
-  -destination 'generic/platform=iOS'
+  -destination 'generic/platform=iOS' \
+  -allowProvisioningUpdates
 ```
 
 <br />
@@ -91,7 +92,8 @@ This produces an `.xcarchive` bundle — the same thing Xcode creates when you d
 xcodebuild -exportArchive \
   -archivePath ./build/YourApp.xcarchive \
   -exportOptionsPlist ExportOptions.plist \
-  -exportPath ./build/ipa
+  -exportPath ./build/ipa \
+  -allowProvisioningUpdates
 ```
 
 <br />
@@ -105,7 +107,7 @@ The `ExportOptions.plist` tells `xcodebuild` how to sign and package the archive
 <plist version="1.0">
 <dict>
     <key>method</key>
-    <string>app-store</string>
+    <string>app-store-connect</string>
     <key>signingStyle</key>
     <string>automatic</string>
     <key>teamID</key>
@@ -120,7 +122,7 @@ The `method` key controls what kind of build you get:
 
 | method | Use case |
 |---|---|
-| `app-store` | Upload to App Store Connect / TestFlight |
+| `app-store-connect` | Upload to App Store Connect / TestFlight |
 | `ad-hoc` | Distribute to registered devices directly |
 | `development` | Debug builds for registered devices |
 | `enterprise` | In-house distribution (requires Enterprise account) |
@@ -148,6 +150,53 @@ The `--apiKey` and `--apiIssuer` flags use an App Store Connect API key — you 
 <br />
 
 **When to use:** CI/CD pipelines, scripted builds, or when you want reproducible builds without opening Xcode.
+
+<br />
+
+---
+
+<br />
+
+#### Troubleshooting
+
+<br />
+
+##### "No profiles were found" error during archive
+
+If the `xcodebuild archive` command fails with:
+
+```
+No profiles for 'com.yourapp' were found: Xcode couldn't find any iOS App Development
+provisioning profiles matching 'com.yourapp'. Automatic signing is disabled and unable
+to generate a profile. To enable automatic signing, pass -allowProvisioningUpdates to
+xcodebuild.
+```
+
+This happens when Xcode can't automatically manage provisioning profiles from the CLI. The fix is to pass `-allowProvisioningUpdates` to both the `archive` and `exportArchive` commands — this flag lets xcodebuild communicate with Apple's developer portal to create or update profiles automatically. The commands in this post already include this flag.
+
+<br />
+
+##### "app-store" method name is deprecated
+
+When exporting with `method: app-store` in `ExportOptions.plist`, you may see:
+
+```
+Command line name "app-store" is deprecated. Use "app-store-connect" instead.
+```
+
+Update your `ExportOptions.plist` to use `app-store-connect` as the method value. The export still succeeds with the old name, but `app-store-connect` is the current canonical name.
+
+<br />
+
+##### No App Store Connect API key for CLI upload
+
+If you don't have an API key set up for `xcrun altool --upload-app`, you can upload the `.ipa` manually using the **Transporter** app on your Mac:
+
+```bash
+open -a Transporter build/ipa/YourApp.ipa
+```
+
+This is often simpler for one-off uploads — just sign in with your Apple ID and drag the `.ipa` in.
 
 <br />
 
