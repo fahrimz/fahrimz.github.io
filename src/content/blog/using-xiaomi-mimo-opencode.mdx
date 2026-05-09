@@ -1,0 +1,97 @@
+---
+title: 'Using Xiaomi MiMo Credits on OpenCode'
+description: 'Step-by-step guide to configure Xiaomi MiMo as a custom provider in OpenCode AI coding agent'
+pubDate: 'May 09 2025'
+---
+
+[OpenCode](https://opencode.ai) is an open-source AI coding agent that supports 75+ LLM providers. If you have Xiaomi MiMo credits, you can use them by configuring MiMo as a custom OpenAI-compatible provider.
+
+This guide walks through the setup.
+
+<br />
+
+#### Prerequisites
+
+- [OpenCode](https://opencode.ai) installed
+- Xiaomi MiMo API key
+
+If you got free tokens from a MiMo event, get your API key at [platform.xiaomimimo.com/console/plan-manage](https://platform.xiaomimimo.com/console/plan-manage).
+
+<br />
+
+#### Step 1: Find Your Models
+
+First, list the available models from MiMo's API:
+
+```bash
+curl -H "Authorization: Bearer YOUR_API_KEY" https://token-plan-sgp.xiaomimimo.com/v1/models
+```
+
+Response:
+
+```json
+{
+  "object": "list",
+  "data": [
+    { "id": "mimo-v2-omni", "object": "model", "owned_by": "xiaomi" },
+    { "id": "mimo-v2-pro", "object": "model", "owned_by": "xiaomi" },
+    { "id": "mimo-v2.5", "object": "model", "owned_by": "xiaomi" },
+    { "id": "mimo-v2.5-pro", "object": "model", "owned_by": "xiaomi" }
+  ]
+}
+```
+
+<br />
+
+#### Step 2: Add Credentials in OpenCode
+
+1. Run `/connect` in the OpenCode TUI
+2. Scroll down and select **Other**
+3. Enter `xiaomi-mimo` as the provider ID
+4. Paste your MiMo API key
+
+<br />
+
+#### Step 3: Configure opencode.json
+
+Add the provider to your global config at `~/.config/opencode/opencode.json`:
+
+```json
+{
+  "$schema": "https://opencode.ai/config.json",
+  "provider": {
+    "xiaomi-mimo": {
+      "npm": "@ai-sdk/openai-compatible",
+      "name": "Xiaomi MiMo",
+      "options": {
+        "baseURL": "https://token-plan-sgp.xiaomimimo.com/v1"
+      },
+      "models": {
+        "mimo-v2-pro": {
+          "name": "MiMo V2 Pro"
+        },
+        "mimo-v2.5": {
+          "name": "MiMo V2.5"
+        },
+        "mimo-v2.5-pro": {
+          "name": "MiMo V2.5 Pro"
+        }
+      }
+    }
+  }
+}
+```
+
+<br />
+
+#### Step 4: Select a Model
+
+Run `/models` in OpenCode and pick a MiMo model. For coding tasks, `mimo-v2.5-pro` is the most capable option.
+
+<br />
+
+#### Notes
+
+- MiMo uses an OpenAI-compatible API protocol, so the `@ai-sdk/openai-compatible` npm package is used
+- The API endpoint is `https://token-plan-sgp.xiaomimimo.com/v1`
+- MiMo also provides an Anthropic-compatible endpoint at `https://token-plan-sgp.xiaomimimo.com/anthropic` if you prefer that protocol
