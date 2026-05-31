@@ -14,6 +14,7 @@ type Project = {
   link: string;
   image: ImageMetadata;
   keywords: string[];
+  year: number;
 };
 
 const projects: Project[] = [
@@ -22,6 +23,7 @@ const projects: Project[] = [
     description: "Japanese dictionary quiz app",
     link: "https://fahrimz.github.io/jlpt",
     image: ImgJlpt,
+    year: 2024,
     keywords: [
       "Frontend",
       "React",
@@ -37,6 +39,7 @@ const projects: Project[] = [
     description: "Indonesian coffee beans e-commerce",
     link: "https://mezza-9.id",
     image: ImgMezza9,
+    year: 2024,
     keywords: [
       "Fullstack",
       "React",
@@ -56,6 +59,7 @@ const projects: Project[] = [
     description: "Realtime chat app",
     link: "https://fahrimz.github.io/chat_vue",
     image: ImgChat,
+    year: 2025,
     keywords: ["Fullstack", "Vue", "Express", "Websocket", "Typescript"],
   },
 ];
@@ -89,7 +93,7 @@ const projects: Project[] = [
                     />
                     <div class="pt-2 pb-4 px-4">
                       <h6 class="text-lg mb-0!">{project.title}</h6>
-                      <p class="text-sm text-gray-500">{project.description}</p>
+                      <p class="text-sm text-gray-500">{project.description} · {project.year}</p>
                       <ul class="flex flex-wrap gap-2 text-xs mt-4">
                         {project.keywords.map((keyword, index) => (
                           <ProjectChip
