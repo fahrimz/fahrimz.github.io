@@ -1,0 +1,30 @@
+---
+import BaseHead from "../../components/BaseHead.astro";
+import Header from "../../components/Header.astro";
+import { SITE_TITLE, SITE_DESCRIPTION } from "../../consts";
+
+const items = [
+  { name: "Skills", link: "/ai/skills" },
+];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+  </head>
+  <body class="h-full flex flex-col gap-4 max-w-3xl mx-auto mb-20">
+    <Header />
+    <main class="main">
+      <h1>AI</h1>
+
+      <ol class="list-decimal list-inside">
+        {items.map((item) => (
+          <li>
+            <a href={item.link}>{item.name}</a>
+          </li>
+        ))}
+      </ol>
+    </main>
+  </body>
+</html>
