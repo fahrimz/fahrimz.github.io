@@ -5,7 +5,10 @@ import { SITE_TITLE } from "../consts";
 
 <header>
   <nav class="px-8 pt-4 flex flex-row items-center justify-between gap-4">
-    <a class="text-xl text-black" href="/">{SITE_TITLE}</a>
+    <a class="text-xl text-black shrink-0" href="/">
+      <span class="md:hidden">FZ</span>
+      <span class="hidden md:inline">{SITE_TITLE}</span>
+    </a>
     <div class="flex flow-row gap-4">
       <HeaderLink href="/blog">Blog</HeaderLink>
       <HeaderLink href="/projects">Projects</HeaderLink>
